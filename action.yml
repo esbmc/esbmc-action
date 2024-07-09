@@ -10,7 +10,7 @@ runs:
       with:
         DIFF_FILTER: ACMR
         ABSOLUTE: true
-        PATTERNS: *@(.c|.cpp|.cu|.kt|.kts|.py|.sol)
+        PATTERNS: "*@(.c|.cpp|.cu|.kt|.kts|.py|.sol)"
 
     - run: readarray -d ' ' -t pathArr &&
            for path in "${pathArr[@]}";
