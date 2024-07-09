@@ -9,7 +9,7 @@ runs:
       uses: technote-space/get-diff-action@v6.1.2
       with:
         DIFF_FILTER: ACMR
-        ABSOLUTE: true
+        ABSOLUTE: false
         PATTERNS: "*@(.c|.cpp|.cu|.kt|.kts|.py|.sol)"
 
     - run: readarray -d ' ' -t pathArr < <(${{ steps.get-diff.outputs.diff }})
@@ -18,4 +18,3 @@ runs:
              esbmc path
            done
       shell: bash
-      continue-on-error: false
