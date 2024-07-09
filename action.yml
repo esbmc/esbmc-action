@@ -5,14 +5,14 @@ runs:
   using: 'composite'
   steps:
     - name: Get Diff Action
-      id: diff
+      id: get-diff
       uses: technote-space/get-diff-action@v6.1.2
       with:
         DIFF_FILTER: ACMR
         ABSOLUTE: true
         PATTERNS: "*@(.c|.cpp|.cu|.kt|.kts|.py|.sol)"
 
-    - run: readarray -d ' ' -t pathArr &&
+    - run: readarray -d ' ' -t pathArr < <(${{ steps.get-diff.outputs.diff }}) &&
            for path in "${pathArr[@]}";
            do
              esbmc path
