@@ -13,7 +13,7 @@ runs:
         PATTERNS: "*@(.c|.cpp|.cu|.kt|.kts|.py|.sol)"
 
     - run: readarray -d ' ' -t pathArr < <(${{ steps.get-diff.outputs.diff }}) &&
-           for path in "${pathArr[@]}";
+           for path in "${pathArr[@]}"
            do
              esbmc path
            done
