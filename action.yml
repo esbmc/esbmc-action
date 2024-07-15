@@ -5,17 +5,25 @@ runs:
   using: 'composite'
   steps:
     - name: Get Diff Action
-      id: diff
+      id: get-diff
       uses: technote-space/get-diff-action@v6.1.2
       with:
         DIFF_FILTER: ACMR
-        ABSOLUTE: true
-        PATTERNS: *@(.c|.cpp|.cu|.kt|.kts|.py|.sol)
+        ABSOLUTE: false
+        PATTERNS: "*@(.c|.cpp|.cu|.kt|.kts|.py|.sol)"
+    
+    - name: Install ESBMC
+      run: sudo apt update
+           sudo apt-get install -y clang-14 llvm-14 clang-tidy-14 python-is-python3 python3 git ccache unzip wget curl bison flex g++-multilib linux-libc-dev libboost-all-dev libz3-dev libclang-14-dev libclang-cpp-dev cmake
+           git clone https://github.com/esbmc/esbmc.git
+           mkdir build && cd build
+           cmake ../esbmc -DENABLE_Z3=1
+           make -j4
+      shell: bash
 
-    - run: readarray -d ' ' -t pathArr &&
-           for path in "${pathArr[@]}";
+    - run: readarray -d ' ' -t pathArr < <(${{ steps.get-diff.outputs.diff }})
+           for path in "${pathArr[@]}"
            do
              esbmc path
            done
       shell: bash
-      continue-on-error: false
