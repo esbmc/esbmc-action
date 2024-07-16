@@ -13,12 +13,12 @@ runs:
         PATTERNS: "*@(.c|.cpp|.cu|.kt|.kts|.py|.sol)"
     
     - name: Install ESBMC
-      run: cd .. && ls && cd .. && ls && cd .. && ls &&
-           sudo apt update && sudo apt install wget &&
+      run: sudo apt update && sudo apt install wget &&
            wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip &&
            file esbmc.zip &&
            unzip -o esbmc.zip &&
-           cp bin/esbmc /usr/bin
+           pwd &&
+           export PATH=$(pwd)/bin/:$PATH
       shell: bash
 
     - name: Run ESBMC
