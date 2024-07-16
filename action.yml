@@ -19,6 +19,7 @@ runs:
         unzip -o esbmc.zip
         chmod +x ./bin/esbmc
       shell: bash
+      if: ${{ steps.get-diff.outputs.diff != '' }}
 
     - name: Run ESBMC
       run: |
@@ -28,3 +29,4 @@ runs:
           $GITHUB_WORKSPACE/bin/esbmc $path
         done
       shell: bash
+      if: ${{ steps.get-diff.outputs.diff != '' }}
