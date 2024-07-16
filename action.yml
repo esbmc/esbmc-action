@@ -18,7 +18,7 @@ runs:
         wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
         file esbmc.zip
         unzip -o esbmc.zip
-        pwd
+        echo $HOME
         echo "$HOME/esbmc-action/esbmc-action/bin/" >> $GITHUB_PATH
       shell: bash
 
