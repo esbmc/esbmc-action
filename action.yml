@@ -22,7 +22,7 @@ runs:
 
     - name: Run ESBMC
       run: echo $GITHUB_PATH &&
-           readarray -d ' ' -t pathArr < ${{ steps.get-diff.outputs.diff }}
+           readarray -d ' ' -t pathArr < ${{ steps.get-diff.outputs.diff }} &&
            for path in "${pathArr[@]}"
            do
              esbmc $path
