@@ -14,7 +14,7 @@ runs:
     
     - name: Install ESBMC
       run: sudo apt update && sudo apt install wget &&
-           wget https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip -o esbmc.zip &&
+           wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip &&
            file esbmc.zip &&
            unzip -o esbmc.zip &&
            cp esbmc/bin/esbmc /usr/bin
