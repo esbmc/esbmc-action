@@ -17,14 +17,13 @@ runs:
            wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip &&
            file esbmc.zip &&
            unzip -o esbmc.zip &&
-           pwd &&
-           export PATH=$(pwd)/bin/:$PATH
+           echo "$HOME/bin/" >> $GITHUB_PATH
       shell: bash
 
     - name: Run ESBMC
       run: readarray -d ' ' -t pathArr < <(${{ steps.get-diff.outputs.diff }})
            for path in "${pathArr[@]}"
            do
-             esbmc path
+             esbmc $path
            done
       shell: bash
