@@ -24,6 +24,6 @@ runs:
         readarray -d ' ' -t pathArr < ${{ steps.get-diff.outputs.diff }}
         for path in "${pathArr[@]}"
         do
-          sudo $GITHUB_WORKSPACE/bin/esbmc $path
+          $GITHUB_WORKSPACE/bin/esbmc $path
         done
       shell: bash
