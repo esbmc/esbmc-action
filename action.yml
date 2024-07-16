@@ -16,10 +16,8 @@ runs:
       run: |
         sudo apt update && sudo apt install wget
         wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
-        file esbmc.zip
         unzip -o esbmc.zip
-        echo $HOME
-        echo "$HOME/esbmc-action/esbmc-action/bin/" >> $GITHUB_PATH
+        echo "$GITHUB_WORKSPACE/bin/" >> $GITHUB_PATH
       shell: bash
 
     - name: Run ESBMC
