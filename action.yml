@@ -26,6 +26,6 @@ runs:
         readarray -d ' ' -t pathArr < ${{ steps.get-diff.outputs.diff }}
         for path in "${pathArr[@]}"
         do
-          esbmc $path
+          sudo esbmc $path
         done
       shell: bash
