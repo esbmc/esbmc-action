@@ -10,7 +10,7 @@ runs:
       with:
         DIFF_FILTER: ACMR
         ABSOLUTE: false
-        PATTERNS: "*@(.c|.cpp|.cu|.kt|.kts|.py|.sol)"
+        PATTERNS: "**@(.c|.cpp|.cu|.kt|.kts|.py|.sol)"
     
     - name: Install ESBMC
       run: |
