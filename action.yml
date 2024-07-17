@@ -1,6 +1,12 @@
 name: ESBMC verification action
 description: Verifies single- and multithreaded C/C++, CUDA, CHERI, Kotlin, Python, and Solidity programs using the ESBMC.
 
+inputs:
+  esbmc-options:
+    description: Options to be used with ESBMC
+    required: false
+    default: ""
+
 runs:
   using: 'composite'
   steps:
@@ -26,7 +32,7 @@ runs:
         readarray -d ' ' -t pathArr < ${{ steps.get-diff.outputs.diff }}
         for path in "${pathArr[@]}"
         do
-          $GITHUB_WORKSPACE/bin/esbmc $path
+          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
         done
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' }}
