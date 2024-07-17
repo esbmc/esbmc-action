@@ -29,14 +29,16 @@ runs:
 
     - name: Run ESBMC Linux
       run: |
-          readarray -d ' ' -t pathArr < ${{ steps.get-diff.outputs.diff }}
-          for path in "${pathArr[@]}"
-          do
-            if [ -e $path ]
-            then
-              cat $path
-            fi
-          done
+        readarray -d ' ' -t pathArr < ${{ steps.get-diff.outputs.diff }}
+        for path in "${pathArr[@]}"
+        do
+          if [ -e $path ]
+          then
+            cat $path
+          else
+            echo "File does not exist"
+          fi
+        done
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
     
