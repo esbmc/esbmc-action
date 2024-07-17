@@ -29,8 +29,7 @@ runs:
 
     - name: Run ESBMC Linux
       run: |
-        readarray -d ' ' -t pathArr < ${{ steps.get-diff.outputs.diff }}
-        for path in "${pathArr[@]}"
+        for path in "${{ steps.get-diff.outputs.diff }}"
         do
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
         done
