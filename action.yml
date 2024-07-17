@@ -32,7 +32,8 @@ runs:
         brew install wget boost
         wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
         unzip -o esbmc.zip
-        chmod +x ./bin/esbmc
+        chmod +x $GITHUB_WORKSPACE/bin/esbmc
+        $GITHUB_WORKSPACE/bin/esbmc --default-solver smtlib
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
     
@@ -40,7 +41,6 @@ runs:
       run: |
         for path in ${{ steps.get-diff.outputs.diff }}
         do
-          $GITHUB_WORKSPACE/bin/esbmc --list-solvers
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
         done
       shell: bash
