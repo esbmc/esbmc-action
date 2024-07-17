@@ -18,16 +18,16 @@ runs:
         ABSOLUTE: false
         PATTERNS: "**/*@(.c|.cpp|.cu|.kt|.kts|.py|.sol)"
     
-    - name: Install ESBMC
+    - name: Install ESBMC Linux
       run: |
         sudo apt update && sudo apt install wget
         wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
         unzip -o esbmc.zip
         chmod +x ./bin/esbmc
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' }}
+      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
 
-    - name: Run ESBMC
+    - name: Run ESBMC Linux
       run: |
         readarray -d ' ' -t pathArr < ${{ steps.get-diff.outputs.diff }}
         for path in "${pathArr[@]}"
@@ -35,4 +35,22 @@ runs:
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
         done
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' }}
+      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
+    
+    - name: Install ESBMC macOS
+      run: |
+        brew install wget
+        wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
+        unzip -o esbmc.zip
+        chmod +x ./bin/esbmc
+      shell: bash
+      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
+    
+    - name: Run ESBMC macOS
+      run: |
+        for path in "${{ steps.get-diff.outputs.diff }}"
+        do
+          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
+        done
+      shell: bash
+      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
