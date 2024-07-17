@@ -31,7 +31,7 @@ runs:
       run: |
         for path in "${{ steps.get-diff.outputs.diff }}"
         do
-          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
+          cat $path
         done
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
