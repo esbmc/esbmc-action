@@ -29,10 +29,14 @@ runs:
 
     - name: Run ESBMC Linux
       run: |
-        for path in "${{ steps.get-diff.outputs.diff }}"
-        do
-          cat $path
-        done
+          readarray -d ' ' -t pathArr < ${{ steps.get-diff.outputs.diff }}
+          for path in "${pathArr[@]}"
+          do
+            if [ -e $path ]
+            then
+              cat $path
+            fi
+          done
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
     
