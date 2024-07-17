@@ -29,16 +29,7 @@ runs:
 
     - name: Run ESBMC Linux
       run: |
-        for path in "${{ steps.get-diff.outputs.diff }}"
-        do
-          echo $path
-          if [ -e cfile.c ]
-          then
-            echo "File exists"
-          else
-            echo "File does not exist"
-          fi
-        done
+        $GITHUB_WORKSPACE/bin/esbmc cfile.c
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
     
