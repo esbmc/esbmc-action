@@ -5,7 +5,7 @@ inputs:
   esbmc-options:
     description: Options to be used with ESBMC
     required: false
-    default: ""
+    default: "--incremental-bmc"
 
 runs:
   using: 'composite'
@@ -26,12 +26,6 @@ runs:
         chmod +x ./bin/esbmc
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
-
-    - name: Run ESBMC Linux
-      run: |
-        $GITHUB_WORKSPACE/bin/esbmc cfile.c
-      shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
     
     - name: Install ESBMC macOS
       run: |
@@ -42,11 +36,12 @@ runs:
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
     
-    - name: Run ESBMC macOS
+    - name: Run ESBMC
       run: |
+        echo ${{ steps.get-diff.outputs.diff }}
         for path in "${{ steps.get-diff.outputs.diff }}"
         do
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
         done
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
+      if: ${{ steps.get-diff.outputs.diff != '' }}
