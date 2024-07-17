@@ -40,7 +40,7 @@ runs:
       run: |
         for path in ${{ steps.get-diff.outputs.diff }}
         do
-          esbmc --list-solvers
+          $GITHUB_WORKSPACE/bin/esbmc --list-solvers
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
         done
       shell: bash
