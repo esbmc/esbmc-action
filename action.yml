@@ -31,6 +31,7 @@ runs:
       run: |
         readarray -d ' ' -t pathArr < ${{ steps.get-diff.outputs.diff }}
         for path in "${pathArr[@]}"
+        echo $path
         do
           if [ -e $path ]
           then
