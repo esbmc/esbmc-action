@@ -29,10 +29,9 @@ runs:
 
     - name: Run ESBMC Linux
       run: |
-        readarray -d ' ' -t pathArr < ${{ steps.get-diff.outputs.diff }}
-        for path in "${pathArr[@]}"
-        echo $path
+        for path in "${{ steps.get-diff.outputs.diff }}"
         do
+          echo $path
           if [ -e $path ]
           then
             cat $path
