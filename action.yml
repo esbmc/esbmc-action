@@ -37,6 +37,7 @@ runs:
     
     - name: Run ESBMC Linux
       run: |
+        IFS="\n"
         for path in ${{ steps.get-diff.outputs.diff }}
         do
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
@@ -57,6 +58,7 @@ runs:
     
     - name: Run ESBMC macOS
       run: |
+        IFS="\n"
         for path in ${{ steps.get-diff.outputs.diff }}
         do
           $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} $path
