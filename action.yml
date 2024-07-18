@@ -10,14 +10,10 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Get Diff Action
-      id: get-diff
-      uses: technote-space/get-diff-action@v6.1.2
-      with:
-        DIFF_FILTER: ACMR
-        ABSOLUTE: false
-        PATTERNS: "**/*@(.c|.cpp|.cu|.kt|.kts|.py|.sol)"
-    
+    - name: Get Git Diff
+      run: echo `git diff --name-only HEAD HEAD^`
+      shell: bash
+        
     - name: Install ESBMC Linux
       run: |
         sudo apt update && sudo apt install wget
