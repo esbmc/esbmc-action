@@ -19,7 +19,6 @@ runs:
     - name: Get Git Diff
       id: get-diff
       run: |
-        echo "diff=$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')"
         echo "FILE_DIFF<<EOF" >> $GITHUB_ENV
         echo "$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')" >> "$GITHUB_ENV"
         echo "EOF" >> $GITHUB_ENV
@@ -27,7 +26,7 @@ runs:
     
     - run: echo "No changes in files of the correct type have been detected."
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff == '' }}
+      if: ${{ env.FILE_DIFF == '' }}
     
 
     - name: Install ESBMC Linux
@@ -37,18 +36,18 @@ runs:
         unzip -o esbmc.zip
         chmod +x $GITHUB_WORSKPACE/bin/esbmc
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
     
     - name: Run ESBMC Linux
       run: |
         IFS="\n"
-        for path in ${{ steps.get-diff.outputs.diff }}
+        for path in ${{ env.FILE_DIFF }}
         do
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
         done
         echo "Finished verifying files."
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
 
 
     - name: Install ESBMC macOS
@@ -58,15 +57,15 @@ runs:
         unzip -o esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
     
     - name: Run ESBMC macOS
       run: |
         IFS="\n"
-        for path in ${{ steps.get-diff.outputs.diff }}
+        for path in ${{ env.FILE_DIFF }}
         do
           $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} $path
         done
         echo "Finished verifying files."
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
