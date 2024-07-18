@@ -10,8 +10,13 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+      
     - name: Get Git Diff
-      run: echo `git diff HEAD HEAD^`
+      run: echo `git diff --name-only HEAD HEAD^`
       shell: bash
         
     - name: Install ESBMC Linux
