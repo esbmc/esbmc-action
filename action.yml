@@ -14,12 +14,18 @@ runs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 2
-      
+    
+
     - name: Get Git Diff
       id: get-diff
-      run: echo "$(git diff --name-only HEAD HEAD^ | grep -E '\.c|\.cpp')"
+      run: echo "diff=$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')" >> "$GITHUB_OUTPUT"
       shell: bash
-        
+    
+    - run: echo "No changes in files of the correct type have been detected."
+      shell: bash
+      if: ${{ steps.get-diff.outputs.diff == '' }}
+    
+
     - name: Install ESBMC Linux
       run: |
         sudo apt update && sudo apt install wget
@@ -35,8 +41,10 @@ runs:
         do
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
         done
+        echo "Finished verifying files."
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
+
 
     - name: Install ESBMC macOS
       run: |
@@ -53,5 +61,6 @@ runs:
         do
           $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} $path
         done
+        echo "Finished verifying files."
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
