@@ -42,7 +42,6 @@ runs:
         wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
         unzip -o esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
-        $GITHUB_WORKSPACE/bin/esbmc --default-solver smtlib
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
     
