@@ -34,7 +34,7 @@ runs:
         sudo apt update && sudo apt install wget
         wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
         unzip -o esbmc.zip
-        chmod +x $GITHUB_WORSKPACE/bin/esbmc
+        chmod +x $GITHUB_WORKSPACE/bin/esbmc
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
     
