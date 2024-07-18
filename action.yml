@@ -11,7 +11,7 @@ runs:
   using: 'composite'
   steps:
     - name: Get Git Diff
-      run: echo `git diff HEAD^`
+      run: echo `git diff HEAD HEAD^`
       shell: bash
         
     - name: Install ESBMC Linux
