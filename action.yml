@@ -18,10 +18,9 @@ runs:
 
     - name: Get Git Diff
       id: get-diff
-      run: | 
-        echo $GITHUB_OUTPUT
-        echo "diff=$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')"
-        echo "diff=$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')" >> "${GITHUB_OUTPUT}"
+      run: |
+        echo "diff='$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')'"
+        echo "diff='$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')'" >> "${GITHUB_OUTPUT}"
       shell: bash
     
     - run: echo "No changes in files of the correct type have been detected."
