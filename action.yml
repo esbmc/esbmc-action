@@ -27,6 +27,15 @@ runs:
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
     
+    - name: Run ESBMC Linux
+      run: |
+        for path in ${{ steps.get-diff.outputs.diff }}
+        do
+          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
+        done
+      shell: bash
+      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
+
     - name: Install ESBMC macOS
       run: |
         brew install wget boost
@@ -37,11 +46,11 @@ runs:
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
     
-    - name: Run ESBMC
+    - name: Run ESBMC macOS
       run: |
         for path in ${{ steps.get-diff.outputs.diff }}
         do
-          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
+          $GITHUB_WORKSPACE/bin/esbmc --smtlib ${{ inputs.esbmc-options }} $path
         done
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' }}
+      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
