@@ -16,7 +16,8 @@ runs:
         fetch-depth: 2
       
     - name: Get Git Diff
-      run: echo `git diff --name-only HEAD HEAD^`
+      id: get-diff
+      run: echo "diff-files=$(git diff --name-only HEAD HEAD^ | grep -E '\.c|\.cpp')"
       shell: bash
         
     - name: Install ESBMC Linux
