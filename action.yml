@@ -49,7 +49,7 @@ runs:
       run: |
         for path in ${{ steps.get-diff.outputs.diff }}
         do
-          $GITHUB_WORKSPACE/bin/esbmc --smtlib ${{ inputs.esbmc-options }} $path
+          $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} $path
         done
       shell: bash
       if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
