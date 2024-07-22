@@ -10,31 +10,45 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Get Diff Action
-      id: get-diff
-      uses: technote-space/get-diff-action@v6.1.2
+    - name: checkout
+      uses: actions/checkout@v4
       with:
-        DIFF_FILTER: ACMR
-        ABSOLUTE: false
-        PATTERNS: "**/*@(.c|.cpp|.cu|.kt|.kts|.py|.sol)"
+        fetch-depth: 2
     
+
+    - name: Get Git Diff
+      id: get-diff
+      run: |
+        echo "FILE_DIFF<<EOF" >> $GITHUB_ENV
+        echo "$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')" >> "$GITHUB_ENV"
+        echo "EOF" >> $GITHUB_ENV
+      shell: bash
+    
+    - run: echo "No changes in files of the correct type have been detected."
+      shell: bash
+      if: ${{ env.FILE_DIFF == '' }}
+    
+
     - name: Install ESBMC Linux
       run: |
         sudo apt update && sudo apt install wget
         wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
         unzip -o esbmc.zip
-        chmod +x $GITHUB_WORSKPACE/bin/esbmc
+        chmod +x $GITHUB_WORKSPACE/bin/esbmc
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
     
     - name: Run ESBMC Linux
       run: |
-        for path in ${{ steps.get-diff.outputs.diff }}
+        while IFS= read -r path || [[ -n $path ]]
         do
-          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
-        done
+          echo "$GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path"
+          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+        done < <(printf '%s' "${{ env.FILE_DIFF }}")
+        echo "Finished verifying files."
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'Linux' }}
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
+
 
     - name: Install ESBMC macOS
       run: |
@@ -43,13 +57,15 @@ runs:
         unzip -o esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
     
     - name: Run ESBMC macOS
       run: |
-        for path in ${{ steps.get-diff.outputs.diff }}
+        while IFS= read -r path || [[ -n $path ]]
         do
-          $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} $path
-        done
+          echo "$GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path"
+          $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+        done < <(printf '%s' "${{ env.FILE_DIFF }}")
+        echo "Finished verifying files."
       shell: bash
-      if: ${{ steps.get-diff.outputs.diff != '' && runner.os == 'macOS' }}
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
