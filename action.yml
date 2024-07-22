@@ -29,6 +29,7 @@ runs:
       if: ${{ env.FILE_DIFF == '' }}
     
 
+
     - name: Install ESBMC Linux
       run: |
         sudo apt update && sudo apt install wget
@@ -42,12 +43,12 @@ runs:
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
-          echo "$GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
+
 
 
     - name: Install ESBMC macOS
@@ -63,9 +64,28 @@ runs:
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
-          echo "$GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path"
           $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
+    
+
+
+    - name: Install ESBMC Windows
+      run: |
+        winget install wget
+        wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip
+        unzip -o esbmc.zip
+        chmod +x $GITHUB_WORKSPACE/bin/esbmc
+      shell: bash
+    
+    - name: Run ESBMC Windows
+      run: |
+        while IFS= read -r path || [[ -n $path ]]
+        do
+          echo "$GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path"
+          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+        done < <(printf '%s' "${{ env.FILE_DIFF }}")
+        echo "Finished verifying files."
+      shell: bash
