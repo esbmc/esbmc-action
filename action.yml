@@ -64,7 +64,7 @@ runs:
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "$GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path"
-          $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+          $GITHUB_WORKSPACE/bin/esbmc --smtlib ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "Finished verifying files."
       shell: bash
