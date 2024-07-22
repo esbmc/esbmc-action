@@ -74,10 +74,11 @@ runs:
 
     - name: Install ESBMC Windows
       run: |
-        curl --url https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip -o esbmc.zip
+        client = new-object System.Net.WebClient
+        client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip","$env:GITHUB_WORKSPACE\esbmc.zip")
         unzip -o esbmc.zip
-        chmod +x $GITHUB_WORKSPACE/bin/esbmc
-      shell: bash
+        chmod +x env:GITHUB_WORKSPACE/bin/esbmc
+      shell: powershell
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
     
     - name: Run ESBMC Windows
