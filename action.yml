@@ -25,7 +25,7 @@ runs:
       shell: bash
     
     - run: |
-        echo "\n"
+        echo $'\n'
         echo "----------------------------------------------------"
         echo "No git diff in files of the correct type have been detected."
       shell: bash
@@ -46,13 +46,13 @@ runs:
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
-          echo "\n"
+          echo $'\n'
           echo "----------------------------------------------------"
-          echo "\n"
+          echo $'\n'
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
-        echo "\n"
+        echo $'\n'
         echo "----------------------------------------------------"
         echo "Finished verifying files."
       shell: bash
@@ -73,13 +73,13 @@ runs:
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
-          echo "\n"
+          echo $'\n'
           echo "----------------------------------------------------"
-          echo "\n"
+          echo $'\n'
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
-        echo ""
+        echo $'\n'
         echo "----------------------------------------------------"
         echo "Finished verifying files."
       shell: bash
@@ -100,13 +100,13 @@ runs:
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
-          echo "\n"
+          echo $'\n'
           echo "----------------------------------------------------"
-          echo "\n"
+          echo $'\n'
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
-        echo "\n"
+        echo $'\n'
         echo "----------------------------------------------------"
         echo "Finished verifying files."
       shell: bash
