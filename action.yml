@@ -74,7 +74,7 @@ runs:
 
     - name: Install ESBMC Windows
       run: |
-        curl -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip
+        curl --url https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip -o esbmc.zip
         unzip -o esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
       shell: bash
