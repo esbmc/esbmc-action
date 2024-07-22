@@ -44,7 +44,7 @@ runs:
         do
           echo "$GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
-        done < <("${{ env.FILE_DIFF }}")
+        done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
