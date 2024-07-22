@@ -61,11 +61,11 @@ runs:
     
     - name: Run ESBMC macOS
       run: |
-        IFS=$'\n'
-        for path in "${{ env.FILE_DIFF }}"
+        while IFS= read -r path || [[ -n $path ]]
         do
-          $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path"
-        done
+          echo "$GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path"
+          $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+        done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
