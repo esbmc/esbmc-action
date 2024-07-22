@@ -43,7 +43,7 @@ runs:
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "$GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path"
-          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
+          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "Finished verifying files."
       shell: bash
