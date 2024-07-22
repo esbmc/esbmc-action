@@ -79,6 +79,7 @@ runs:
         unzip -o esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
       shell: bash
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
     
     - name: Run ESBMC Windows
       run: |
@@ -89,3 +90,4 @@ runs:
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "Finished verifying files."
       shell: bash
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
