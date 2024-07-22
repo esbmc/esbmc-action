@@ -40,6 +40,7 @@ runs:
     
     - name: Run ESBMC Linux
       run: |
+        IFS="\n"
         echo $GITHUB_WORKSPACE
         for path in "${{ env.FILE_DIFF }}"
         do
