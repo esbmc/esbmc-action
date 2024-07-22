@@ -5,7 +5,7 @@ inputs:
   esbmc-options:
     description: Options to be used with ESBMC
     required: false
-    default: "--incremental-bmc --quiet --smt-model --color --verbosity 5"
+    default: "--incremental-bmc --quiet --smt-model --color --verbosity 4"
 
 runs:
   using: 'composite'
@@ -24,7 +24,10 @@ runs:
         echo "EOF" >> $GITHUB_ENV
       shell: bash
     
-    - run: echo "No git diff in files of the correct type have been detected."
+    - run: |
+        echo ""
+        echo "----------------------------------------------------"
+        echo "No git diff in files of the correct type have been detected."
       shell: bash
       if: ${{ env.FILE_DIFF == '' }}
     
@@ -43,8 +46,14 @@ runs:
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
+          echo ""
+          echo "----------------------------------------------------"
+          echo ""
+          echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
+        echo ""
+        echo "----------------------------------------------------"
         echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
@@ -64,8 +73,14 @@ runs:
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
+          echo ""
+          echo "----------------------------------------------------"
+          echo ""
+          echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
+        echo ""
+        echo "----------------------------------------------------"
         echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
@@ -85,8 +100,14 @@ runs:
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
+          echo ""
+          echo "----------------------------------------------------"
+          echo ""
+          echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
+        echo ""
+        echo "----------------------------------------------------"
         echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
