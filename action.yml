@@ -43,6 +43,7 @@ runs:
         IFS="
         "
         echo $GITHUB_WORKSPACE
+        echo "${{ env.FILE_DIFF }}"
         for path in "${{ env.FILE_DIFF }}"
         do
           echo $path
