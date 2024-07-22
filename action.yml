@@ -76,7 +76,7 @@ runs:
       run: |
         echo $env:GITHUB_WORKSPACE
         $client = new-object System.Net.WebClient
-        $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
+        $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE \esbmc.zip")
         unzip -o esbmc.zip
         chmod +x env:GITHUB_WORKSPACE/bin/esbmc
       shell: powershell
