@@ -45,6 +45,7 @@ runs:
         for path in "${{ env.FILE_DIFF }}"
         do
           echo $path
+          echo "$GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
         done
         echo "Finished verifying files."
