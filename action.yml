@@ -5,7 +5,7 @@ inputs:
   esbmc-options:
     description: Options to be used with ESBMC
     required: false
-    default: "--incremental-bmc"
+    default: "--incremental-bmc --quiet"
 
 runs:
   using: 'composite'
@@ -24,7 +24,7 @@ runs:
         echo "EOF" >> $GITHUB_ENV
       shell: bash
     
-    - run: echo "No changes in files of the correct type have been detected."
+    - run: echo "No git diff in files of the correct type have been detected."
       shell: bash
       if: ${{ env.FILE_DIFF == '' }}
     
@@ -34,7 +34,7 @@ runs:
       run: |
         sudo apt update && sudo apt install wget
         wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
-        unzip -o esbmc.zip
+        unzip -o -q esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
@@ -55,7 +55,7 @@ runs:
       run: |
         brew install wget boost
         wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
-        unzip -o esbmc.zip
+        unzip -o -q esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
@@ -76,7 +76,7 @@ runs:
       run: |
         $client = new-object System.Net.WebClient
         $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
-        unzip -o esbmc.zip
+        unzip -o -q esbmc.zip
         chmod +x $env:GITHUB_WORKSPACE/bin/esbmc
       shell: powershell
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
