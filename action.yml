@@ -40,7 +40,8 @@ runs:
     
     - name: Run ESBMC Linux
       run: |
-        IFS="\n"
+        IFS="
+        "
         echo $GITHUB_WORKSPACE
         for path in "${{ env.FILE_DIFF }}"
         do
@@ -63,7 +64,8 @@ runs:
     
     - name: Run ESBMC macOS
       run: |
-        IFS="\n"
+        IFS="
+        "
         for path in "${{ env.FILE_DIFF }}"
         do
           $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} $path
