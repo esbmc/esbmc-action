@@ -40,15 +40,12 @@ runs:
     
     - name: Run ESBMC Linux
       run: |
-        IFS="
-        "
-        echo $GITHUB_WORKSPACE
-        echo "${{ env.FILE_DIFF }}"
-        for path in "${{ env.FILE_DIFF }}"
-        do
-          echo $path
-          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
-        done
+        $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "${{ env.FILE_DIFF }}"
+        #for path in "${{ env.FILE_DIFF }}"
+        #do
+        #  echo $path
+        #  $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path
+        #done
         echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
