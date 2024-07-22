@@ -43,12 +43,11 @@ runs:
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "$GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} $path"
-          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
+          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
-      continue-on-error: true
 
 
     - name: Install ESBMC macOS
