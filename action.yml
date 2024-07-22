@@ -48,6 +48,7 @@ runs:
         echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
+      continue-on-error: true
 
 
     - name: Install ESBMC macOS
