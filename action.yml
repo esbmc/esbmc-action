@@ -44,12 +44,10 @@ runs:
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
-          echo "----------------------------------------------------"
+          echo -e "\n----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
-        echo "----------------------------------------------------"
-        echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
 
@@ -72,8 +70,6 @@ runs:
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
-        echo "----------------------------------------------------"
-        echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
     
@@ -96,7 +92,10 @@ runs:
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
-        echo "----------------------------------------------------"
-        echo "Finished verifying files."
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
+    
+    - run: |
+        echo -e "\n----------------------------------------------------"
+        echo "Finished verifying files."
+      shell: bash
