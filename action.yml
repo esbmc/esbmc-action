@@ -44,7 +44,7 @@ runs:
     
     - name: Get output file name
       run: |
-        options = ${{ inputs.esbmc-options }}
+        options=${{ inputs.esbmc-options }}
         if [[ $options =~ "--output-goto" ]]; then
           goto_filename=`grep -oP "--output-goto\s*\K\S*(?=\s)"`
           echo "GOTO_FILENAME=$goto_filename" >> $GITHUB_ENV
