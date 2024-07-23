@@ -64,6 +64,7 @@ runs:
     
     - name: Run ESBMC macOS
       run: |
+        $GITHUB_WORKSPACE/bin/esbmc --list-solvers
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
