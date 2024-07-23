@@ -25,7 +25,7 @@ runs:
       shell: bash
     
     - run: |
-        printf "\n----------------------------------------------------"
+        echo "----------------------------------------------------"
         echo "No git diff in files of the correct type have been detected."
       shell: bash
       if: ${{ env.FILE_DIFF == '' }}
@@ -44,7 +44,7 @@ runs:
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
-          printf "\n----------------------------------------------------"
+          echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
@@ -66,7 +66,7 @@ runs:
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
-          printf "\n----------------------------------------------------"
+          echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
@@ -88,7 +88,7 @@ runs:
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
-          printf "\n----------------------------------------------------"
+          echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
@@ -96,6 +96,6 @@ runs:
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
     
     - run: |
-        printf "\n----------------------------------------------------"
+        echo "----------------------------------------------------"
         echo "Finished verifying files."
       shell: bash
