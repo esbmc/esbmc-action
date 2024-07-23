@@ -5,7 +5,7 @@ inputs:
   esbmc-options:
     description: Options to be used with ESBMC
     required: false
-    default: "--incremental-bmc --quiet --color --verbosity 4"
+    default: --incremental-bmc --quiet --color --verbosity 2
 
 runs:
   using: 'composite'
@@ -34,7 +34,7 @@ runs:
 
     - name: Install ESBMC Linux
       run: |
-        sudo apt -qq update && sudo apt -qq install wget
+        # sudo apt -qq update && sudo apt -qq install wget
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
         unzip -o -q esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
