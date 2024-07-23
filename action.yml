@@ -44,19 +44,19 @@ runs:
     
     - name: Get output file name
       run: |
-        options=${{ inputs.esbmc-options }}
+        options="${{ inputs.esbmc-options }}"
         if [[ $options =~ "--output-goto" ]]; then
-          goto_filename=`grep -oP "--output-goto\s*\K\S*(?=\s)"`
+          goto_filename="`grep -oP '--output-goto\s*\K\S*(?=\s)'`"
           echo "GOTO_FILENAME=$goto_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--file-output" ]]; then
-          output_filename=`grep -oP "--file-output\s*\K\S*(?=\s)"`
+          output_filename="`grep -oP '--file-output\s*\K\S*(?=\s)'`"
           echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--witness-output" ]]; then
-          witness_filename=`grep -oP "--witness-output\s*\K\S*(?=\s)"`
+          witness_filename="`grep -oP '--witness-output\s*\K\S*(?=\s)'`"
           echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
         fi
       shell: bash
