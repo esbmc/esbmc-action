@@ -34,8 +34,8 @@ runs:
 
     - name: Install ESBMC Linux
       run: |
-        sudo apt update && sudo apt install wget
-        wget -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
+        sudo apt -qq update && sudo apt -qq install wget
+        wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
         unzip -o -q esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
       shell: bash
