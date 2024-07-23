@@ -5,7 +5,7 @@ inputs:
   esbmc-options:
     description: Options to be used with ESBMC
     required: false
-    default: --incremental-bmc --quiet --color --verbosity 3
+    default: --incremental-bmc --quiet --color --verbosity 4
 
 runs:
   using: 'composite'
