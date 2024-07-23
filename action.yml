@@ -3,9 +3,21 @@ description: Verifies single- and multithreaded C/C++, CUDA, CHERI, Kotlin, Pyth
 
 inputs:
   esbmc-options:
-    description: Options to be used with ESBMC
+    description: Options to be used with ESBMC.
     required: false
     default: --incremental-bmc --quiet --color --verbosity 4
+  create-artifact:
+    description: Whether or not to create an artifact containing ESBMC output files (y/n).
+    required: false
+    default: n
+  artifact-retention-days:
+    description: Number of days after which any produced artifacts will expire.
+    required: false
+    default: "0"
+  artifact-compression-level:
+    description: The level of compression for Zlib to be applied to the artifact archive. Can take values from 0 to 9.
+    required: false
+    default: "6"
 
 runs:
   using: 'composite'
@@ -30,7 +42,25 @@ runs:
       shell: bash
       if: ${{ env.FILE_DIFF == '' }}
     
+    - name: Get output file name
+      run: |
+        options = ${{ inputs.esbmc-options }}
+        if [[ $options =~ "--output-goto" ]]; then
+          goto_filename=`grep -oP "--output-goto\s*\K\S*(?=\s)"`
+          echo "GOTO_FILENAME=$goto_filename" >> $GITHUB_ENV
+        fi
 
+        if [[ $options =~ "--file-output" ]]; then
+          output_filename=`grep -oP "--file-output\s*\K\S*(?=\s)"`
+          echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
+        fi
+
+        if [[ $options =~ "--witness-output" ]]; then
+          witness_filename=`grep -oP "--witness-output\s*\K\S*(?=\s)"`
+          echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
+        fi
+      shell: bash
+      if: ${{ env.FILE_DIFF != '' && (inputs.create-artifact == y || inputs.create-artifact == Y) }}
 
     - name: Install ESBMC Linux
       run: |
@@ -47,6 +77,17 @@ runs:
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          if [[ $options =~ "--output-goto" ]]; then
+            mv "$GOTO_FILENAME" "__$path_$GOTO_FILENAME"
+          fi
+
+          if [[ $options =~ "--file-output" ]]; then
+            mv "$OUTPUT_FILENAME" "__$path_$OUTPUT_FILENAME"
+          fi
+
+          if [[ $options =~ "--witness-output" ]]; then
+            mv "$WITNESS_FILENAME" "__$path_$WITNESS_FILENAME"
+          fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
@@ -64,7 +105,6 @@ runs:
     
     - name: Run ESBMC macOS
       run: |
-        $GITHUB_WORKSPACE/bin/esbmc --list-solvers
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
@@ -96,6 +136,21 @@ runs:
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
     
+
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: esbmc_output
+        path: |
+          *_$GOTO_FILENAME
+          *_$OUTPUT_FILENAME
+          *_$WITNESS_FILENAME
+        if-no-files-found: warn
+        retention-days: ${{ inputs.artifact-retention-days }}
+        compression-level: ${{ inputs.artifact-compression-level }}
+      if: ${{ env.FILE_DIFF != '' && (inputs.create-artifact == y || inputs.create-artifact == Y) }}
+
     - run: |
         echo "----------------------------------------------------"
         echo "Finished verifying files."
