@@ -85,10 +85,7 @@ runs:
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
-            echo "$OUTPUT_FILENAME"
-            echo "$path"
-            echo "__""$path""_""$OUTPUT_FILENAME"
-            mv "$OUTPUT_FILENAME" "__$path_$OUTPUT_FILENAME"
+            mv "$OUTPUT_FILENAME" "__""$path""_""$OUTPUT_FILENAME"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
