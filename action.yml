@@ -51,7 +51,7 @@ runs:
         fi
 
         if [[ $options =~ "--file-output" ]]; then
-          output_filename="`grep -oP '--file-output\s*\K\S*(?=\s)' < <($options)`"
+          output_filename="`grep -oP -f - '--file-output\s*\K\S*(?=\s)' < <($options)`"
           echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
         fi
 
