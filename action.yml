@@ -62,7 +62,7 @@ runs:
           echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
         fi
       shell: bash
-      if: ${{ env.FILE_DIFF != '' && (inputs.create-artifact == 'y' || inputs.create-artifact == 'Y') }}
+      if: ${{ env.FILE_DIFF != '' }}
 
 
 
@@ -94,18 +94,17 @@ runs:
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+            if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; 
+              mv "$GOTO_FILENAME" "__""$path""_""$GOTO_FILENAME"
+            fi
 
-          if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
-            mv "$GOTO_FILENAME" "__""$path""_""$GOTO_FILENAME"
-          fi
+            if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
+              mv "$OUTPUT_FILENAME" "__""$path""_""$OUTPUT_FILENAME"
+            fi
 
-          if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
-            mv "$OUTPUT_FILENAME" "__""$path""_""$OUTPUT_FILENAME"
-          fi
-
-          if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
-            mv "$WITNESS_FILENAME" "__""$path""_""$WITNESS_FILENAME"
-          fi
+            if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
+              mv "$WITNESS_FILENAME" "__""$path""_""$WITNESS_FILENAME"
+            fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "----------------------------------------------------"
         echo "Finished verifying files."
