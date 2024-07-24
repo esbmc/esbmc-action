@@ -83,6 +83,7 @@ runs:
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
             echo "$OUTPUT_FILENAME"
+            echo "__$path_$OUTPUT_FILENAME"
             mv "$OUTPUT_FILENAME" "__$path_$OUTPUT_FILENAME"
           fi
 
