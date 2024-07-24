@@ -109,6 +109,7 @@ runs:
         echo "----------------------------------------------------"
         echo "Finished verifying files."
         echo "----------------------------------------------------"
+        ls
       shell: bash
       if: ${{ env.FILE_DIFF != '' && (runner.os == 'Linux' || runner.os == 'Windows') }}
 
