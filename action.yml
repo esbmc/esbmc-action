@@ -81,7 +81,8 @@ runs:
             mv "$GOTO_FILENAME" "__$path_$GOTO_FILENAME"
           fi
 
-          if [[ $options =~ "--file-output" ]]; then
+          if [[ $options =~ "--file-output" ]]; 
+            echo "$OUTPUT_FILENAME"
             mv "$OUTPUT_FILENAME" "__$path_$OUTPUT_FILENAME"
           fi
 
