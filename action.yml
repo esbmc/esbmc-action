@@ -67,8 +67,8 @@ runs:
       run: |
         brew install -q boost
         if  [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" || "${{ inputs.esbmc-options }}" =~ "--file-output" || "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
-          echo "Installing grep..."
           brew install -q grep
+          PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
         fi
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
         unzip -o -q esbmc.zip
