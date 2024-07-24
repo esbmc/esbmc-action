@@ -67,6 +67,7 @@ runs:
       run: |
         brew install -q boost
         if  [[ $options =~ "--output-goto" || $options =~ "--file-output" || $options =~ "--witness-output" ]]; then
+          echo "Installing grep..."
           brew install -q grep
         fi
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
