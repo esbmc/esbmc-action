@@ -123,7 +123,7 @@ runs:
 
     - name: Get output file name macOS
       run: |
-        if [[ $options =~ "--output-goto" || $options =~ "--file-output" || $options =~ "--witness-output" ]]; then
+        if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" || "${{ inputs.esbmc-options }}" =~ "--file-output" || "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
           brew install -q grep
         fi
         options="${{ inputs.esbmc-options }}"
