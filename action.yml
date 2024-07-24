@@ -66,7 +66,7 @@ runs:
     - name: Install ESBMC macOS
       run: |
         brew install -q boost
-        if  [[ ${{ inputs.esbmc-options }} =~ "--output-goto" || ${{ inputs.esbmc-options }} =~ "--file-output" || ${{ inputs.esbmc-options }} =~ "--witness-output" ]]; then
+        if  [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" || "${{ inputs.esbmc-options }}" =~ "--file-output" || "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
           echo "Installing grep..."
           brew install -q grep
         fi
