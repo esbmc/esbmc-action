@@ -63,7 +63,7 @@ runs:
       if: ${{ env.FILE_DIFF != '' && (inputs.create-artifact == 'y' || inputs.create-artifact == 'Y') }}
 
 
-    
+
     - name: Install ESBMC Linux
       run: |
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
@@ -87,7 +87,7 @@ runs:
           if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
             echo "$OUTPUT_FILENAME"
             echo "$path"
-            echo "__$path_$OUTPUT_FILENAME"
+            echo "__""$path""_""$OUTPUT_FILENAME"
             mv "$OUTPUT_FILENAME" "__$path_$OUTPUT_FILENAME"
           fi
 
