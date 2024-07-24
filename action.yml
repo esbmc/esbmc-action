@@ -77,16 +77,16 @@ runs:
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
-          if [[ "${{ inputs.esbmc_options }}" =~ "--output-goto" ]]; then
+          if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
             mv "$GOTO_FILENAME" "__$path_$GOTO_FILENAME"
           fi
 
-          if [[ "${{ inputs.esbmc_options }}" =~ "--file-output" ]]; then
+          if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
             echo "$OUTPUT_FILENAME"
             mv "$OUTPUT_FILENAME" "__$path_$OUTPUT_FILENAME"
           fi
 
-          if [[ "${{ inputs.esbmc_options }}" =~ "--witness-output" ]]; then
+          if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
             mv "$WITNESS_FILENAME" "__$path_$WITNESS_FILENAME"
           fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
