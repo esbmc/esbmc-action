@@ -77,12 +77,14 @@ runs:
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          
           if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
             mv "$GOTO_FILENAME" "__$path_$GOTO_FILENAME"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
             echo "$OUTPUT_FILENAME"
+            echo "$path"
             echo "__$path_$OUTPUT_FILENAME"
             mv "$OUTPUT_FILENAME" "__$path_$OUTPUT_FILENAME"
           fi
