@@ -41,11 +41,45 @@ runs:
         echo "No git diff in files of the correct type have been detected."
       shell: bash
       if: ${{ env.FILE_DIFF == '' }}
-    
+
+
+
+    - name: Install ESBMC Linux
+      run: |
+        wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
+        unzip -o -q esbmc.zip
+        chmod +x $GITHUB_WORKSPACE/bin/esbmc
+      shell: bash
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
+
+
+    - name: Install ESBMC Windows
+      run: |
+        $client = new-object System.Net.WebClient
+        $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
+        unzip -o -q esbmc.zip
+        chmod +x $env:GITHUB_WORKSPACE/bin/esbmc
+      shell: powershell
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
+
+
+    - name: Install ESBMC macOS
+      run: |
+        brew install -q boost
+        if  [[ $options =~ "--output-goto" || $options =~ "--file-output" || $options =~ "--witness-output" ]]; then
+          brew install -q grep
+        fi
+        wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
+        unzip -o -q esbmc.zip
+        chmod +x $GITHUB_WORKSPACE/bin/esbmc
+      shell: bash
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
+
 
 
     - name: Get output file name
       run: |
+        if 
         options="${{ inputs.esbmc-options }}"
         if [[ $options =~ "--output-goto" ]]; then
           goto_filename=`echo "$options" | grep -oP "(--output-goto\s+\K[^\"]\S*(?=\s*?))|(--output-goto\s+\"\K.*(?=\"))"`
@@ -63,27 +97,6 @@ runs:
         fi
       shell: bash
       if: ${{ env.FILE_DIFF != '' }}
-
-
-
-    - name: Install ESBMC Linux
-      run: |
-        wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
-        unzip -o -q esbmc.zip
-        chmod +x $GITHUB_WORKSPACE/bin/esbmc
-      shell: bash
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
-
-
-
-    - name: Install ESBMC Windows
-      run: |
-        $client = new-object System.Net.WebClient
-        $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
-        unzip -o -q esbmc.zip
-        chmod +x $env:GITHUB_WORKSPACE/bin/esbmc
-      shell: powershell
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
     
 
 
@@ -113,15 +126,6 @@ runs:
       if: ${{ env.FILE_DIFF != '' && (runner.os == 'Linux' || runner.os == 'Windows') }}
 
 
-
-    - name: Install ESBMC macOS
-      run: |
-        brew install -q boost
-        wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
-        unzip -o -q esbmc.zip
-        chmod +x $GITHUB_WORKSPACE/bin/esbmc
-      shell: bash
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
     
     - name: Run ESBMC macOS
       run: |
