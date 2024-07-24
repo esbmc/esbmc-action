@@ -62,6 +62,8 @@ runs:
       shell: bash
       if: ${{ env.FILE_DIFF != '' && (inputs.create-artifact == 'y' || inputs.create-artifact == 'Y') }}
 
+
+    
     - name: Install ESBMC Linux
       run: |
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
@@ -77,7 +79,7 @@ runs:
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
-          
+
           if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
             mv "$GOTO_FILENAME" "__$path_$GOTO_FILENAME"
           fi
