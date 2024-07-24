@@ -79,7 +79,6 @@ runs:
 
     - name: Get output file name
       run: |
-        if 
         options="${{ inputs.esbmc-options }}"
         if [[ $options =~ "--output-goto" ]]; then
           goto_filename=`echo "$options" | grep -oP "(--output-goto\s+\K[^\"]\S*(?=\s*?))|(--output-goto\s+\"\K.*(?=\"))"`
