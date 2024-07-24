@@ -42,6 +42,8 @@ runs:
       shell: bash
       if: ${{ env.FILE_DIFF == '' }}
     
+
+
     - name: Get output file name
       run: |
         options="${{ inputs.esbmc-options }}"
@@ -71,8 +73,21 @@ runs:
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
+
+
+
+    - name: Install ESBMC Windows
+      run: |
+        $client = new-object System.Net.WebClient
+        $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
+        unzip -o -q esbmc.zip
+        chmod +x $env:GITHUB_WORKSPACE/bin/esbmc
+      shell: powershell
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
     
-    - name: Run ESBMC Linux
+
+
+    - name: Run ESBMC Linux and Windows
       run: |
         while IFS= read -r path || [[ -n $path ]]
         do
@@ -81,7 +96,7 @@ runs:
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
-            mv "$GOTO_FILENAME" "__$path_$GOTO_FILENAME"
+            mv "$GOTO_FILENAME" "__""$path""_""$GOTO_FILENAME"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
@@ -89,11 +104,11 @@ runs:
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
-            mv "$WITNESS_FILENAME" "__$path_$WITNESS_FILENAME"
+            mv "$WITNESS_FILENAME" "__""$path""_""$WITNESS_FILENAME"
           fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
       shell: bash
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
+      if: ${{ env.FILE_DIFF != '' && (runner.os == 'Linux' || runner.os == 'Windows') }}
 
 
 
@@ -112,32 +127,22 @@ runs:
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+          $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || 
+          
+          if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
+            mv "$GOTO_FILENAME" "__""$path""_""$GOTO_FILENAME"
+          fi
+
+          if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
+            mv "$OUTPUT_FILENAME" "__""$path""_""$OUTPUT_FILENAME"
+          fi
+
+          if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
+            mv "$WITNESS_FILENAME" "__""$path""_""$WITNESS_FILENAME"
+          fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
       shell: bash
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
-    
-
-
-    - name: Install ESBMC Windows
-      run: |
-        $client = new-object System.Net.WebClient
-        $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
-        unzip -o -q esbmc.zip
-        chmod +x $env:GITHUB_WORKSPACE/bin/esbmc
-      shell: powershell
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
-    
-    - name: Run ESBMC Windows
-      run: |
-        while IFS= read -r path || [[ -n $path ]]
-        do
-          echo "----------------------------------------------------"
-          echo "Running ESBMC on $path"
-          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
-        done < <(printf '%s' "${{ env.FILE_DIFF }}")
-      shell: bash
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}    
     
 
 
