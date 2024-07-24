@@ -65,6 +65,7 @@ runs:
 
     - name: Get output file name Linux and Windows
       run: |
+        export LANG=C.UTF-8
         grep --version
         options="${{ inputs.esbmc-options }}"
         if [[ $options =~ "--output-goto" ]]; then
