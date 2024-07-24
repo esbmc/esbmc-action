@@ -63,23 +63,7 @@ runs:
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
 
 
-    - name: Install ESBMC macOS
-      run: |
-        brew install -q boost
-        if  [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" || "${{ inputs.esbmc-options }}" =~ "--file-output" || "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
-          brew install -q grep
-          PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
-          grep --help
-        fi
-        wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
-        unzip -o -q esbmc.zip
-        chmod +x $GITHUB_WORKSPACE/bin/esbmc
-      shell: bash
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
-
-
-
-    - name: Get output file name
+    - name: Get output file name Linux and Windows
       run: |
         options="${{ inputs.esbmc-options }}"
         if [[ $options =~ "--output-goto" ]]; then
@@ -97,8 +81,7 @@ runs:
           echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
         fi
       shell: bash
-      if: ${{ env.FILE_DIFF != '' }}
-    
+      if: ${{ env.FILE_DIFF != '' && (runner.os == 'Linux' || runner.os == 'Windows') }}
 
 
     - name: Run ESBMC Linux and Windows
@@ -128,6 +111,40 @@ runs:
 
 
     
+    - name: Install ESBMC macOS
+      run: |
+        brew install -q boost
+        wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
+        unzip -o -q esbmc.zip
+        chmod +x $GITHUB_WORKSPACE/bin/esbmc
+      shell: bash
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
+
+
+    - name: Get output file name macOS
+      run: |
+        if [[ $options =~ "--output-goto" || $options =~ "--file-output" || $options =~ "--witness-output" ]]; then
+          brew install -q grep
+        fi
+        options="${{ inputs.esbmc-options }}"
+        if [[ $options =~ "--output-goto" ]]; then
+          goto_filename=`echo "$options" | ggrep -oP "(--output-goto\s+\K[^\"]\S*(?=\s*?))|(--output-goto\s+\"\K.*(?=\"))"`
+          echo "GOTO_FILENAME=$goto_filename" >> $GITHUB_ENV
+        fi
+
+        if [[ $options =~ "--file-output" ]]; then
+          output_filename=`echo "$options" | ggrep -oP "(--file-output\s+\K[^\"]\S*(?=\s*?))|(--file-output\s+\"\K.*(?=\"))"`
+          echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
+        fi
+
+        if [[ $options =~ "--witness-output" ]]; then
+          witness_filename=`echo "$options" | ggrep -oP "(--witness-output\s+\K[^\"]\S*(?=\s*?))|(--witness-output\s+\"\K.*(?=\"))"`
+          echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
+        fi
+      shell: bash
+      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
+
+
     - name: Run ESBMC macOS
       run: |
         while IFS= read -r path || [[ -n $path ]]
