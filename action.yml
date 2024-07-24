@@ -107,6 +107,9 @@ runs:
             mv "$WITNESS_FILENAME" "__""$path""_""$WITNESS_FILENAME"
           fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
+        echo "----------------------------------------------------"
+        echo "Finished verifying files."
+        echo "----------------------------------------------------"
       shell: bash
       if: ${{ env.FILE_DIFF != '' && (runner.os == 'Linux' || runner.os == 'Windows') }}
 
@@ -141,6 +144,9 @@ runs:
             mv "$WITNESS_FILENAME" "__""$path""_""$WITNESS_FILENAME"
           fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
+        echo "----------------------------------------------------"
+        echo "Finished verifying files."
+        echo "----------------------------------------------------"
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}    
     
@@ -158,8 +164,3 @@ runs:
         retention-days: ${{ inputs.artifact-retention-days }}
         compression-level: ${{ inputs.artifact-compression-level }}
       if: ${{ env.FILE_DIFF != '' && (inputs.create-artifact == 'y' || inputs.create-artifact == 'Y') }}
-
-    - run: |
-        echo "----------------------------------------------------"
-        echo "Finished verifying files."
-      shell: bash
