@@ -89,6 +89,7 @@ runs:
             mv "$WITNESS_FILENAME" "__$path_$WITNESS_FILENAME"
           fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
+        ls
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
 
