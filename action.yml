@@ -77,6 +77,7 @@ runs:
         if [[ $options =~ "--file-output" ]]; then
           output_filename=`echo "$options" | grep -oP "(--file-output\s+\K[^\']\S*(?=\s*?))|(--file-output\s+'\K.*(?='))"`
           output_filename="${output_filename//+([[:space:]])/}"
+          echo "$output_filename"
           echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
         fi
 
