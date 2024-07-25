@@ -77,14 +77,14 @@ runs:
         if [[ $options =~ "--file-output" ]]; then
           output_filename=`echo "$options" | grep -oP "(--file-output\s+\K[^\']\S*(?=\s*?))|(--file-output\s+'\K.*(?='))"`
           echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
-          nospace_output_filename="${OUTPUT_FILENAME//+([[:space:]])/}"
+          nospace_output_filename="${output_filename//+([[:space:]])/}"
           echo "NOSPACE_OUTPUT_FILENAME=$nospace_output_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--witness-output" ]]; then
           witness_filename=`echo "$options" | grep -oP "(--witness-output\s+\K[^\']\S*(?=\s*?))|(--witness-output\s+'\K.*(?='))"`
           echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
-          nospace_witness_filename="${WITNESS_FILENAME//+([[:space:]])/}"
+          nospace_witness_filename="${witness_filename//+([[:space:]])/}"
           echo "NOSPACE_WITNESS_FILENAME=$nospace_witness_filename" >> $GITHUB_ENV
         fi
       shell: bash
@@ -146,14 +146,14 @@ runs:
         if [[ $options =~ "--file-output" ]]; then
           output_filename=`echo "$options" | ggrep -oP "(--file-output\s+\K[^\']\S*(?=\s*?))|(--file-output\s+'\K.*(?='))"`
           echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
-          nospace_output_filename="${OUTPUT_FILENAME//+([[:space:]])/}"
+          nospace_output_filename="${output_filename//+([[:space:]])/}"
           echo "NOSPACE_OUTPUT_FILENAME=$nospace_output_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--witness-output" ]]; then
           witness_filename=`echo "$options" | ggrep -oP "(--witness-output\s+\K[^\']\S*(?=\s*?))|(--witness-output\s+'\K.*(?='))"`
           echo "WITNESS_FILENAME=$witness_filename" >> $
-          nospace_witness_filename="${WITNESS_FILENAME//+([[:space:]])/}"
+          nospace_witness_filename="${witness_filename//+([[:space:]])/}"
           echo "NOSPACE_WITNESS_FILENAME=$nospace_witness_filename" >> $GITHUB_ENV
         fi
       shell: bash
