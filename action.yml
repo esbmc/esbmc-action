@@ -66,24 +66,19 @@ runs:
     - name: Get output file name Linux and Windows
       run: |
         export LANG=C.UTF-8
-        shopt -s extglob
         options="${{ inputs.esbmc-options }}"
         if [[ $options =~ "--output-goto" ]]; then
           goto_filename=`echo "$options" | grep -oP "(--output-goto\s+\K[^\']\S*(?=\s*?))|(--output-goto\s+'\K.*(?='))"`
-          goto_filename="${goto_filename//+([[:space:]])/}"
           echo "GOTO_FILENAME=$goto_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--file-output" ]]; then
           output_filename=`echo "$options" | grep -oP "(--file-output\s+\K[^\']\S*(?=\s*?))|(--file-output\s+'\K.*(?='))"`
-          output_filename="${output_filename//+([[:space:]])/}"
-          echo "$output_filename"
           echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--witness-output" ]]; then
           witness_filename=`echo "$options" | grep -oP "(--witness-output\s+\K[^\']\S*(?=\s*?))|(--witness-output\s+'\K.*(?='))"`
-          witness_filename"${witness_filename//+([[:space:]])/}"
           echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
         fi
       shell: bash
@@ -92,21 +87,22 @@ runs:
 
     - name: Run ESBMC Linux and Windows
       run: |
+        shopt -s extglob
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
             if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
-              mv "$GOTO_FILENAME" "__""$path""_""$GOTO_FILENAME"
+              mv "$GOTO_FILENAME" "__""$path""_""${$GOTO_FILENAME//+([[:space:]])/}"
             fi
 
             if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
-              mv "$OUTPUT_FILENAME" "__""$path""_""$OUTPUT_FILENAME"
+              mv "$OUTPUT_FILENAME" "__""$path""_""${$OUTPUT_FILENAME//+([[:space:]])/}"
             fi
 
             if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
-              mv "$WITNESS_FILENAME" "__""$path""_""$WITNESS_FILENAME"
+              mv "$WITNESS_FILENAME" "__""$path""_""${$WITNESS_FILENAME//+([[:space:]])/}"
             fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "----------------------------------------------------"
@@ -133,23 +129,19 @@ runs:
         if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" || "${{ inputs.esbmc-options }}" =~ "--file-output" || "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
           brew install -q grep
         fi
-        shopt -s extglob
         options="${{ inputs.esbmc-options }}"
         if [[ $options =~ "--output-goto" ]]; then
           goto_filename=`echo "$options" | ggrep -oP "(--output-goto\s+\K[^\']\S*(?=\s*?))|(--output-goto\s+'\K.*(?='))"`
-          goto_filename="${goto_filename//+([[:space:]])/}"
           echo "GOTO_FILENAME=$goto_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--file-output" ]]; then
           output_filename=`echo "$options" | ggrep -oP "(--file-output\s+\K[^\']\S*(?=\s*?))|(--file-output\s+'\K.*(?='))"`
-          output_filename="${output_filename//+([[:space:]])/}"
           echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--witness-output" ]]; then
           witness_filename=`echo "$options" | ggrep -oP "(--witness-output\s+\K[^\']\S*(?=\s*?))|(--witness-output\s+'\K.*(?='))"`
-          witness_filename"${witness_filename//+([[:space:]])/}"
           echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
         fi
       shell: bash
@@ -158,21 +150,22 @@ runs:
 
     - name: Run ESBMC macOS
       run: |
+        shopt -s extglob
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
           if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
-            mv "$GOTO_FILENAME" "__""$path""_""$GOTO_FILENAME"
+            mv "$GOTO_FILENAME" "__""$path""_""${$GOTO_FILENAME//+([[:space:]])/}"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
-            mv "$OUTPUT_FILENAME" "__""$path""_""$OUTPUT_FILENAME"
+            mv "$OUTPUT_FILENAME" "__""$path""_""${$OUTPUT_FILENAME//+([[:space:]])/}"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
-            mv "$WITNESS_FILENAME" "__""$path""_""$WITNESS_FILENAME"
+            mv "$WITNESS_FILENAME" "__""$path""_""${$WITNESS_FILENAME//+([[:space:]])/}"
           fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "----------------------------------------------------"
