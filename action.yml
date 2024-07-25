@@ -167,16 +167,15 @@ runs:
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
-          ls
-          if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
+          if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f $GOTO_FILENAME ]]; then
             mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
           fi
 
-          if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
+          if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" && -f $OUTPUT_FILENAME ]]; then
             mv "$OUTPUT_FILENAME" "__""$path""_""$NOSPACE_OUTPUT_FILENAME"
           fi
 
-          if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
+          if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f $WITNESS_FILENAME ]]; then
             mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
           fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
