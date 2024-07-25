@@ -91,7 +91,8 @@ runs:
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || 
+          ls
             if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
               mv "$GOTO_FILENAME" "__""$path""_""$GOTO_FILENAME"
             fi
