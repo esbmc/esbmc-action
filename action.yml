@@ -92,7 +92,6 @@ runs:
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
-          ls
             if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
               mv "$GOTO_FILENAME" "__""$path""_""$GOTO_FILENAME"
             fi
@@ -179,9 +178,9 @@ runs:
       with:
         name: esbmc_output
         path: |
-          *_${{ env.GOTO_FILENAME }}
-          *_${{ env.OUTPUT_FILENAME }}
-          *_${{ env.WITNESS_FILENAME }}
+          "*_${{ env.GOTO_FILENAME }}"
+          "*_${{ env.OUTPUT_FILENAME }}"
+          "*_${{ env.WITNESS_FILENAME }}"
         if-no-files-found: warn
         retention-days: ${{ inputs.artifact-retention-days }}
         compression-level: ${{ inputs.artifact-compression-level }}
