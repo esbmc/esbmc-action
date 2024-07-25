@@ -179,9 +179,9 @@ runs:
       with:
         name: esbmc_output
         path: |
-          *_${{ env.GOTO_FILENAME }}
-          *_${{ env.OUTPUT_FILENAME }}
-          *_${{ env.WITNESS_FILENAME }}
+          *_"${{ env.GOTO_FILENAME }}"
+          *_"${{ env.OUTPUT_FILENAME }}"
+          *_"${{ env.WITNESS_FILENAME }}"
         if-no-files-found: warn
         retention-days: ${{ inputs.artifact-retention-days }}
         compression-level: ${{ inputs.artifact-compression-level }}
