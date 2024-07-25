@@ -73,12 +73,12 @@ runs:
         fi
 
         if [[ $options =~ "--file-output" ]]; then
-          output_filename=`echo "$options" | grep -oP "(--file-output\s+\K[^\"]\S*(?=\s*?))|(--file-output\s+\"\K.*(?=\"))"`
+          output_filename=`echo "$options" | grep -oP "(--file-output\s+\K[^\"]\S*(?=\s*?))|(--file-output\s+\\\"\K.*(?=\\\"))"`
           echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--witness-output" ]]; then
-          witness_filename=`echo "$options" | grep -oP "(--witness-output\s+\K[^\"]\S*(?=\s*?))|(--witness-output\s+\"\K.*(?=\"))"`
+          witness_filename=`echo "$options" | grep -oP "(--witness-output\s+\K[^\"]\S*(?=\s*?))|(--witness-output\s+\\\"\K.*(?=\\\"))"`
           echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
         fi
       shell: bash
