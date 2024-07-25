@@ -152,7 +152,7 @@ runs:
 
         if [[ $options =~ "--witness-output" ]]; then
           witness_filename=`echo "$options" | ggrep -oP "(--witness-output\s+\K[^\']\S*(?=\s*?))|(--witness-output\s+'\K.*(?='))"`
-          echo "WITNESS_FILENAME=$witness_filename" >> $
+          echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
           nospace_witness_filename="${witness_filename//+([[:space:]])/}"
           echo "NOSPACE_WITNESS_FILENAME=$nospace_witness_filename" >> $GITHUB_ENV
         fi
