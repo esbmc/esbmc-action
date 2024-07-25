@@ -28,6 +28,7 @@ runs:
         fetch-depth: 2
     
 
+    # Get the names of all C and C++ files which have a git diff between the current and previous commit.
     - name: Get Git Diff
       id: get-diff
       run: |
@@ -63,6 +64,7 @@ runs:
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
 
 
+    # Extract the file name given in the ESBMC options before removing spaces from them and saving them to environment variables.
     - name: Get output file name Linux and Windows
       run: |
         export LANG=C.UTF-8
@@ -92,6 +94,7 @@ runs:
       if: ${{ env.FILE_DIFF != '' && (runner.os == 'Linux' || runner.os == 'Windows') }}
 
 
+    # Run ESBMC on each C and C++ file in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary.
     - name: Run ESBMC Linux and Windows
       run: |
         while IFS= read -r path || [[ -n $path ]]
@@ -129,6 +132,8 @@ runs:
       if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
 
 
+    # Extract the file name given in the ESBMC options before removing spaces from them and saving them to environment variables (macOS).
+    # Install grep via Brew to allow for Perl-regex support.
     - name: Get output file name macOS
       run: |
         shopt -s extglob
@@ -160,6 +165,7 @@ runs:
       if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
 
 
+    # Run ESBMC on each C and C++ file in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary (macOS).
     - name: Run ESBMC macOS
       run: |
         while IFS= read -r path || [[ -n $path ]]
