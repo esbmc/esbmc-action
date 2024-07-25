@@ -70,16 +70,22 @@ runs:
         if [[ $options =~ "--output-goto" ]]; then
           goto_filename=`echo "$options" | grep -oP "(--output-goto\s+\K[^\']\S*(?=\s*?))|(--output-goto\s+'\K.*(?='))"`
           echo "GOTO_FILENAME=$goto_filename" >> $GITHUB_ENV
+          nospace_goto_filename="${goto_filename//+([[:space:]])/}"
+          echo "NOSPACE_GOTO_FILENAME=$nospace_goto_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--file-output" ]]; then
           output_filename=`echo "$options" | grep -oP "(--file-output\s+\K[^\']\S*(?=\s*?))|(--file-output\s+'\K.*(?='))"`
           echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
+          nospace_output_filename="${OUTPUT_FILENAME//+([[:space:]])/}"
+          echo "NOSPACE_OUTPUT_FILENAME=$nospace_output_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--witness-output" ]]; then
           witness_filename=`echo "$options" | grep -oP "(--witness-output\s+\K[^\']\S*(?=\s*?))|(--witness-output\s+'\K.*(?='))"`
           echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
+          nospace_witness_filename="${WITNESS_FILENAME//+([[:space:]])/}"
+          echo "NOSPACE_WITNESS_FILENAME=$nospace_witness_filename" >> $GITHUB_ENV
         fi
       shell: bash
       if: ${{ env.FILE_DIFF != '' && (runner.os == 'Linux' || runner.os == 'Windows') }}
@@ -94,15 +100,15 @@ runs:
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
             if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
-              mv "$GOTO_FILENAME" "__""$path""_""${GOTO_FILENAME//+([[:space:]])/}"
+              mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
             fi
 
             if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
-              mv "$OUTPUT_FILENAME" "__""$path""_""${OUTPUT_FILENAME//+([[:space:]])/}"
+              mv "$OUTPUT_FILENAME" "__""$path""_""$NOSPACE_OUTPUT_FILENAME"
             fi
 
             if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
-              mv "$WITNESS_FILENAME" "__""$path""_""${WITNESS_FILENAME//+([[:space:]])/}"
+              mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
             fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "----------------------------------------------------"
@@ -133,16 +139,22 @@ runs:
         if [[ $options =~ "--output-goto" ]]; then
           goto_filename=`echo "$options" | ggrep -oP "(--output-goto\s+\K[^\']\S*(?=\s*?))|(--output-goto\s+'\K.*(?='))"`
           echo "GOTO_FILENAME=$goto_filename" >> $GITHUB_ENV
+          nospace_goto_filename="${goto_filename//+([[:space:]])/}"
+          echo "NOSPACE_GOTO_FILENAME=$nospace_goto_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--file-output" ]]; then
           output_filename=`echo "$options" | ggrep -oP "(--file-output\s+\K[^\']\S*(?=\s*?))|(--file-output\s+'\K.*(?='))"`
           echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
+          nospace_output_filename="${OUTPUT_FILENAME//+([[:space:]])/}"
+          echo "NOSPACE_OUTPUT_FILENAME=$nospace_output_filename" >> $GITHUB_ENV
         fi
 
         if [[ $options =~ "--witness-output" ]]; then
           witness_filename=`echo "$options" | ggrep -oP "(--witness-output\s+\K[^\']\S*(?=\s*?))|(--witness-output\s+'\K.*(?='))"`
-          echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
+          echo "WITNESS_FILENAME=$witness_filename" >> $
+          nospace_witness_filename="${WITNESS_FILENAME//+([[:space:]])/}"
+          echo "NOSPACE_WITNESS_FILENAME=$nospace_witness_filename" >> $GITHUB_ENV
         fi
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
@@ -157,15 +169,15 @@ runs:
           echo "Running ESBMC on $path"
           $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
           if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" ]]; then
-            mv "$GOTO_FILENAME" "__""$path""_""${GOTO_FILENAME//+([[:space:]])/}"
+            mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" ]]; then
-            mv "$OUTPUT_FILENAME" "__""$path""_""${OUTPUT_FILENAME//+([[:space:]])/}"
+            mv "$OUTPUT_FILENAME" "__""$path""_""$NOSPACE_OUTPUT_FILENAME"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" ]]; then
-            mv "$WITNESS_FILENAME" "__""$path""_""${WITNESS_FILENAME//+([[:space:]])/}"
+            mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
           fi
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "----------------------------------------------------"
@@ -181,9 +193,9 @@ runs:
       with:
         name: esbmc_output
         path: |
-          "*_${{ env.GOTO_FILENAME }}"
-          "*_${{ env.OUTPUT_FILENAME }}"
-          "*_${{ env.WITNESS_FILENAME }}"
+          *_${{ env.NOSPACE_GOTO_FILENAME }}
+          *_${{ env.NOSPACE_OUTPUT_FILENAME }}
+          *_${{ env.NOSPACE_WITNESS_FILENAME }}
         if-no-files-found: warn
         retention-days: ${{ inputs.artifact-retention-days }}
         compression-level: ${{ inputs.artifact-compression-level }}
