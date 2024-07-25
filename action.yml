@@ -106,6 +106,7 @@ runs:
         done < <(printf '%s' "${{ env.FILE_DIFF }}")
         echo "----------------------------------------------------"
         echo "Finished verifying files."
+        ls
         echo "----------------------------------------------------"
       shell: bash
       if: ${{ env.FILE_DIFF != '' && (runner.os == 'Linux' || runner.os == 'Windows') }}
