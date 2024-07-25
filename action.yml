@@ -11,7 +11,7 @@ inputs:
     required: false
     default: n
   artifact-retention-days:
-    description: Number of days after which any produced artifacts will expire.
+    description: Number of days after which any produced artifacts will expire. Minimum 1 day. Maximum 90 days unless changed from the repository settings page.
     required: false
     default: "0"
   artifact-compression-level:
