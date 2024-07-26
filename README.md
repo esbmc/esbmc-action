@@ -52,3 +52,28 @@ The GitHub ID of the created Artifact, can be used by the REST API. If no artifa
 #### artifact-url:
 
 The URL to download the artifact. Can be used in many scenarios such as linking to artifacts in issues or pull requests. Users must be logged-in in order for this URL to work. This URL is valid as long as the artifact has not expired or the artifact, run or repository have not been deleted.
+
+## Usage Example
+
+```
+name: ESBMC Action Demo
+
+on: push
+
+jobs:
+    run-esbmc-action:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Run ESBMC Action
+              id: esbmc-action
+              uses: Goblin57/esbmc-action@v1
+              with:
+                esbmc-options: "--incremental-bmc --quiet --color --file-output out.txt --verbosity 4"
+                create-artifact: y
+                artifact-compression-level: 8
+            
+            - name: Test outputs
+              run: |
+                echo "${{ steps.esbmc-action.outputs.artifact-id }}"
+                echo "${{ steps.esbmc-action.outputs.artifact-url }}"
+```
