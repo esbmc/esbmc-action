@@ -50,6 +50,7 @@ runs:
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
         unzip -o -q esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
+        $GITHUB_WORKSPACE/bin/esbmc --list-solvers
       shell: bash
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
 
@@ -59,7 +60,7 @@ runs:
         $client = new-object System.Net.WebClient
         $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
         unzip -o -q esbmc.zip
-        chmod +x $env:GITHUB_WORKSPACE/bin/esbmc
+        chmod +x $env:GITHUB_WORKSPACE/bin/
       shell: powershell
       if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
 
@@ -97,6 +98,9 @@ runs:
     # Run ESBMC on each C and C++ file in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary.
     - name: Run ESBMC Linux and Windows
       run: |
+        echo "----------------------------------------------------"
+        esbmc --version
+        echo "Running ESBMC for ${{ runner.os }}."
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
@@ -168,6 +172,9 @@ runs:
     # Run ESBMC on each C and C++ file in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary (macOS).
     - name: Run ESBMC macOS
       run: |
+        echo "----------------------------------------------------"
+        esbmc --version
+        echo "Running ESBMC for ${{ runner.os }}."
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
