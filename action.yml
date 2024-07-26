@@ -77,7 +77,6 @@ runs:
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
         unzip -o -q esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
-        $GITHUB_WORKSPACE/bin/esbmc --list-solvers
       shell: bash
       if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'Linux' }}
 
@@ -125,7 +124,7 @@ runs:
     # Run ESBMC on each C and C++ file in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary.
     - name: Run ESBMC Linux and Windows
       run: |
-        if [[ ${{ inputs.files }} == '' ]]; then
+        if [[ "${{ inputs.files }}" == '' ]]; then
           run_files="${{ env.FILE_DIFF }}"
         else
           run_files="${{ inputs.files }}"
@@ -203,7 +202,7 @@ runs:
     # Run ESBMC on each C and C++ file in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary (macOS).
     - name: Run ESBMC macOS
       run: |
-        if [[ ${{ inputs.files }} == '' ]]; then
+        if [[ "${{ inputs.files }}" == '' ]]; then
           run_files="${{ env.FILE_DIFF }}"
         else
           run_files="${{ inputs.files }}"
