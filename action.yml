@@ -246,4 +246,4 @@ runs:
         if-no-files-found: warn
         retention-days: ${{ inputs.artifact-retention-days }}
         compression-level: ${{ inputs.artifact-compression-level }}
-      if: ${{ env.FILE_DIFF != '' && (inputs.create-artifact == 'y' || inputs.create-artifact == 'Y') }}
+      if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && (inputs.create-artifact == 'y' || inputs.create-artifact == 'Y') }}
