@@ -1,5 +1,5 @@
 name: ESBMC verification action
-description: Verifies single- and multithreaded C/C++, CUDA, CHERI, Kotlin, Python, and Solidity programs using the ESBMC.
+description: Verifies C and C++ which are either specified or have a git diff, using the ESBMC.
 
 inputs:
   esbmc-options:
@@ -18,6 +18,15 @@ inputs:
     description: The level of compression for Zlib to be applied to the artifact archive. Can take values from 0 to 9.
     required: false
     default: "6"
+
+outputs:
+  artifact-id:
+    description: The GitHub ID of the created artifact.
+    value: ${{ steps.upload-artifact.outputs.artifact-id }}
+  artifact-url:
+    description: The URL to download the artifact zip files.
+    value: ${{ steps.upload-artifact.outputs.artifact-url }}
+  
 
 runs:
   using: 'composite'
@@ -200,6 +209,7 @@ runs:
 
 
     - name: Upload artifact
+      id: upload-artifact
       uses: actions/upload-artifact@v4
       with:
         name: esbmc_output
