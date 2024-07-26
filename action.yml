@@ -181,7 +181,6 @@ runs:
     - name: Run ESBMC macOS
       run: |
         echo "----------------------------------------------------"
-        esbmc --version
         echo "Running ESBMC for ${{ runner.os }}."
         while IFS= read -r path || [[ -n $path ]]
         do
