@@ -1,5 +1,10 @@
 name: ESBMC verification action
+author: Joshua Hines
 description: Verifies C and C++ which are either specified or have a git diff, using the ESBMC.
+
+branding:
+  color: green
+  icon: check-square
 
 inputs:
   esbmc-options:
