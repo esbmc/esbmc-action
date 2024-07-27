@@ -50,10 +50,10 @@ runs:
         echo "----------------------------------------------------"
         echo "Using specified files"
         echo "..."
-        while IFS= read -r path || [[ -n $path ]]
+        while IFS= read -r path || [[ -n "$path" ]]
         do
-          if [[ ! -f $path ]]; then
-            echo "ERROR: $path can not be found."
+          if [[ ! -f "$path" ]]; then
+            echo "ERROR: The file $path can not be found."
             exit 1
           fi
         done < <(printf '%s' "${{ inputs.files }}")
