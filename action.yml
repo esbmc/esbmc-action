@@ -48,10 +48,26 @@ runs:
 
     - run: |
         echo "----------------------------------------------------"
+        echo "Using specified files"
+        echo "..."
+        while IFS= read -r path || [[ -n $path ]]
+        do
+          if [[ ! -f $path ]]; then
+            echo "ERROR: $path can not be found."
+            exit 1
+          fi
+        done < <(${{ inputs.files }})
+        echo "Files verified, continuing to install."
+      shell: bash
+      if: ${{ inputs.files != '' }}
+
+
+
+    - run: |
+        echo "----------------------------------------------------"
         echo "No files specified. Using git diff."
       shell: bash
       if: ${{ inputs.files == '' }}
-
 
     # Get the names of all C and C++ files which have a git diff between the current and previous commit.
     - name: Get Git Diff
@@ -64,7 +80,6 @@ runs:
       if: ${{ inputs.files == '' }}
 
     - run: |
-        echo "----------------------------------------------------"
         echo "No git diff in files of the correct type have been detected."
         echo "----------------------------------------------------"
       shell: bash
