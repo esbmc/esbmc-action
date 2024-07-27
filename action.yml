@@ -40,12 +40,14 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    # Checkout with a fetch-depth of 2 to allow for checking git diff with previous commit.
     - name: checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 2
 
 
+    # If files are given as input, check that they exist and exit if they don't.
     - run: |
         echo "----------------------------------------------------"
         echo "Using specified files"
@@ -106,7 +108,7 @@ runs:
       if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'Windows' }}
 
 
-    # Extract the file name given in the ESBMC options before removing spaces from them and saving them to environment variables.
+    # Extract the file name given in the ESBMC options (using grep pattern matching) before removing spaces from them and saving them to environment variables.
     - name: Get output file name Linux and Windows
       run: |
         export LANG=C.UTF-8
@@ -136,7 +138,7 @@ runs:
       if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && (runner.os == 'Linux' || runner.os == 'Windows') }}
 
 
-    # Run ESBMC on each C and C++ file in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary.
+    # Run ESBMC on each C and C++ file given as input or in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary.
     - name: Run ESBMC Linux and Windows
       run: |
         if [[ "${{ inputs.files }}" == '' ]]; then
@@ -181,7 +183,7 @@ runs:
       if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'macOS' }}
 
 
-    # Extract the file name given in the ESBMC options before removing spaces from them and saving them to environment variables (macOS).
+    # Extract the file name given in the ESBMC options (using grep pattern matching) before removing spaces from them and saving them to environment variables (macOS).
     # Install grep via Brew to allow for Perl-regex support.
     - name: Get output file name macOS
       run: |
@@ -214,7 +216,7 @@ runs:
       if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'macOS' }}
 
 
-    # Run ESBMC on each C and C++ file in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary (macOS).
+    # Run ESBMC on each C and C++ file given as input or in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary (macOS).
     - name: Run ESBMC macOS
       run: |
         if [[ "${{ inputs.files }}" == '' ]]; then
