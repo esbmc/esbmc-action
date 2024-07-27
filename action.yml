@@ -11,6 +11,10 @@ inputs:
     description: Options to be used with ESBMC.
     required: false
     default: --incremental-bmc --quiet --color --verbosity 4
+  files:
+    description: Newline-separated file paths to be used as input for the ESBMC. If none are given, this action will run based off the git diff.
+    required: false
+    default: ""
   create-artifact:
     description: Whether or not to create an artifact containing ESBMC output files (y/n).
     required: false
@@ -36,11 +40,36 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    # Checkout with a fetch-depth of 2 to allow for checking git diff with previous commit.
     - name: checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 2
-    
+
+
+    # If files are given as input, check that they exist and exit if they don't.
+    - run: |
+        echo "----------------------------------------------------"
+        echo "Using specified files"
+        echo "..."
+        while IFS= read -r path || [[ -n "$path" ]]
+        do
+          if [[ ! -f "$path" ]]; then
+            echo "ERROR: The file $path can not be found."
+            exit 1
+          fi
+        done < <(printf '%s' "${{ inputs.files }}")
+        echo "Files verified, continuing to install."
+      shell: bash
+      if: ${{ inputs.files != '' }}
+
+
+
+    - run: |
+        echo "----------------------------------------------------"
+        echo "No files specified. Using git diff."
+      shell: bash
+      if: ${{ inputs.files == '' }}
 
     # Get the names of all C and C++ files which have a git diff between the current and previous commit.
     - name: Get Git Diff
@@ -50,12 +79,13 @@ runs:
         echo "$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')" >> "$GITHUB_ENV"
         echo "EOF" >> $GITHUB_ENV
       shell: bash
-    
+      if: ${{ inputs.files == '' }}
+
     - run: |
-        echo "----------------------------------------------------"
         echo "No git diff in files of the correct type have been detected."
+        echo "----------------------------------------------------"
       shell: bash
-      if: ${{ env.FILE_DIFF == '' }}
+      if: ${{ env.FILE_DIFF == '' && inputs.files == '' }}
 
 
 
@@ -64,9 +94,8 @@ runs:
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-ubuntu-latest.zip
         unzip -o -q esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
-        $GITHUB_WORKSPACE/bin/esbmc --list-solvers
       shell: bash
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'Linux' }}
+      if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'Linux' }}
 
 
     - name: Install ESBMC Windows
@@ -76,10 +105,10 @@ runs:
         unzip -o -q esbmc.zip
         chmod +x $env:GITHUB_WORKSPACE/bin/
       shell: powershell
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'Windows' }}
+      if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'Windows' }}
 
 
-    # Extract the file name given in the ESBMC options before removing spaces from them and saving them to environment variables.
+    # Extract the file name given in the ESBMC options (using grep pattern matching) before removing spaces from them and saving them to environment variables.
     - name: Get output file name Linux and Windows
       run: |
         export LANG=C.UTF-8
@@ -106,12 +135,17 @@ runs:
           echo "NOSPACE_WITNESS_FILENAME=$nospace_witness_filename" >> $GITHUB_ENV
         fi
       shell: bash
-      if: ${{ env.FILE_DIFF != '' && (runner.os == 'Linux' || runner.os == 'Windows') }}
+      if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && (runner.os == 'Linux' || runner.os == 'Windows') }}
 
 
-    # Run ESBMC on each C and C++ file in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary.
+    # Run ESBMC on each C and C++ file given as input or in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary.
     - name: Run ESBMC Linux and Windows
       run: |
+        if [[ "${{ inputs.files }}" == '' ]]; then
+          run_files="${{ env.FILE_DIFF }}"
+        else
+          run_files="${{ inputs.files }}"
+        fi 
         echo "----------------------------------------------------"
         echo "Running ESBMC for ${{ runner.os }}."
         while IFS= read -r path || [[ -n $path ]]
@@ -130,12 +164,12 @@ runs:
             if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
               mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
             fi
-        done < <(printf '%s' "${{ env.FILE_DIFF }}")
+        done < <(printf '%s' "$run_files")
         echo "----------------------------------------------------"
         echo "Finished verifying files."
         echo "----------------------------------------------------"
       shell: bash
-      if: ${{ env.FILE_DIFF != '' && (runner.os == 'Linux' || runner.os == 'Windows') }}
+      if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && (runner.os == 'Linux' || runner.os == 'Windows') }}
 
 
     
@@ -146,10 +180,10 @@ runs:
         unzip -o -q esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
       shell: bash
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
+      if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'macOS' }}
 
 
-    # Extract the file name given in the ESBMC options before removing spaces from them and saving them to environment variables (macOS).
+    # Extract the file name given in the ESBMC options (using grep pattern matching) before removing spaces from them and saving them to environment variables (macOS).
     # Install grep via Brew to allow for Perl-regex support.
     - name: Get output file name macOS
       run: |
@@ -179,12 +213,17 @@ runs:
           echo "NOSPACE_WITNESS_FILENAME=$nospace_witness_filename" >> $GITHUB_ENV
         fi
       shell: bash
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}
+      if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'macOS' }}
 
 
-    # Run ESBMC on each C and C++ file in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary (macOS).
+    # Run ESBMC on each C and C++ file given as input or in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary (macOS).
     - name: Run ESBMC macOS
       run: |
+        if [[ "${{ inputs.files }}" == '' ]]; then
+          run_files="${{ env.FILE_DIFF }}"
+        else
+          run_files="${{ inputs.files }}"
+        fi
         echo "----------------------------------------------------"
         echo "Running ESBMC for ${{ runner.os }}."
         while IFS= read -r path || [[ -n $path ]]
@@ -203,12 +242,12 @@ runs:
           if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
             mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
           fi
-        done < <(printf '%s' "${{ env.FILE_DIFF }}")
+        done < <(printf '%s' "$run_files")
         echo "----------------------------------------------------"
         echo "Finished verifying files."
         echo "----------------------------------------------------"
       shell: bash
-      if: ${{ env.FILE_DIFF != '' && runner.os == 'macOS' }}    
+      if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'macOS' }}    
     
 
 
@@ -224,4 +263,4 @@ runs:
         if-no-files-found: warn
         retention-days: ${{ inputs.artifact-retention-days }}
         compression-level: ${{ inputs.artifact-compression-level }}
-      if: ${{ env.FILE_DIFF != '' && (inputs.create-artifact == 'y' || inputs.create-artifact == 'Y') }}
+      if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && (inputs.create-artifact == 'y' || inputs.create-artifact == 'Y') }}
