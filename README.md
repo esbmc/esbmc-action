@@ -89,3 +89,11 @@ jobs:
                 echo "${{ steps.esbmc-action.outputs.artifact-id }}"
                 echo "${{ steps.esbmc-action.outputs.artifact-url }}"
 ```
+
+## Environment Variables
+
+This action may create the FILE_DIFF, GOTO_FILENAME, NOSPACE_GOTO_FILENAME, OUTPUT_FILENAME, NOSPACE_OUTPUT_FILENAME, WITNESS_FILENAME and NOSPACE_WITNESS_FILENAME environment variables.
+
+The FILE_DIFF variable is created if the git diff is used. Each "FILENAME" variable is created if its corresponding output file-creating option is used in the "esbmc-options" input.
+
+This action also uses the GITHUB_ENV and GITHUB_WORKSPACE environment variables.
