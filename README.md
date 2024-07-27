@@ -30,13 +30,15 @@ Additionally, when using quotes (single only) to surround the file names used wi
 
 #### files:
 
-Manually specify file paths to be run on ESBMC. If no file paths are given for this input, this action will instead run off files with a git diff. Each file path should be given on their own line, with no quotes or whitespace before or after the path. Example:
+Manually specify file paths to be used with ESBMC. If no file paths are given for this input, this action will instead run off files with a git diff. Each file path should be given on their own line, with no quotes or whitespace before or after the path. Example:
 
 ```
 files: |
     file1.c
     folder/file2.c
 ```
+
+Note that while you may specify any files to be verified, the builds of ESBMC used only support a limited selection of filetypes.
 
 #### create-artifact:
 
