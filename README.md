@@ -10,7 +10,7 @@ Note that only certain SMT solvers are supported on these pre-built releases. On
 
 ```
 - name: Run ESBMC
-  uses: Goblin57/esbmc-action@vx
+  uses: esbmc/esbmc-action@vx
 ```
 (Replace 'x' with the desired version of this action).
 
@@ -78,7 +78,7 @@ jobs:
         steps:
             - name: Run ESBMC Action
               id: esbmc-action
-              uses: Goblin57/esbmc-action@v1
+              uses: esbmc/esbmc-action@v1
               with:
                 esbmc-options: "--incremental-bmc --quiet --color --file-output out.txt --verbosity 4"
                 create-artifact: y
