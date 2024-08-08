@@ -80,9 +80,14 @@ runs:
     - name: Get Git Diff
       id: get-diff
       run: |
+        DIFF_OUT=""
         echo "FILE_DIFF<<EOF" >> $GITHUB_ENV
-        echo "$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')" >> "$GITHUB_ENV"
+        "$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')" |& tee -a "$GITHUB_ENV" >($DIFF_OUT)
         echo "EOF" >> $GITHUB_ENV
+
+        if [[ "$DIFF_OUT" == 'No files specified. Using git diff.' ]]; then
+          echo "Error: it is likely that no checkout with fetch-depth 2 has occured."
+        fi
       shell: bash
       if: ${{ inputs.files == '' }}
 
