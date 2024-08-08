@@ -148,11 +148,11 @@ runs:
         fi 
         echo "----------------------------------------------------"
         echo "Running ESBMC for ${{ runner.os }}."
-        while IFS= read -r path || [[ -n $path ]]
+        \time -f "----------------------------------------------------\nTotal CPU time taken: %Us\t\t\tPeak memory usage: %Mkb" while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          \time -f "CPU time: %U\t\t\t Peak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
             if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
               mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
             fi
@@ -165,7 +165,6 @@ runs:
               mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
             fi
         done < <(printf '%s' "$run_files")
-        echo "----------------------------------------------------"
         echo "Finished verifying files."
         echo "----------------------------------------------------"
       shell: bash
@@ -226,11 +225,11 @@ runs:
         fi
         echo "----------------------------------------------------"
         echo "Running ESBMC for ${{ runner.os }}."
-        while IFS= read -r path || [[ -n $path ]]
+        gtime -f "----------------------------------------------------\nTotal CPU time taken: %Us\t\t\tPeak memory usage: %Mkb" while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          gtime -f "CPU time: %U\t\t\t Peak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+          gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
           if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
             mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
           fi
