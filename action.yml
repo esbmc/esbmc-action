@@ -164,7 +164,7 @@ runs:
             if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
               mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
             fi
-        done < <(printf '%s' "$run_files")'
+        done < <(printf '%s' "$run_files")' 2>&1
         echo "Finished verifying files."
         echo "----------------------------------------------------"
       shell: bash
@@ -241,7 +241,7 @@ runs:
           if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
             mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
           fi
-        done < <(printf '%s' "$run_files")''
+        done < <(printf '%s' "$run_files")' 2>&1
         echo "----------------------------------------------------"
         echo "Finished verifying files."
         echo "----------------------------------------------------"
