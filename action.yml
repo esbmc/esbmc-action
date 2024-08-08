@@ -175,7 +175,7 @@ runs:
     
     - name: Install ESBMC macOS
       run: |
-        brew install -q boost
+        brew install -q boost time
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
         unzip -o -q esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
