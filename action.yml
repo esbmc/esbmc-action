@@ -152,7 +152,7 @@ runs:
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          \time -f "CPU time: %U\t\t\t Peak memory usage: %M" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          \time -f "CPU time: %U\t\t\t Peak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
             if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
               mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
             fi
@@ -230,7 +230,7 @@ runs:
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          \time -f "CPU time: %U\t\t\t Peak memory usage: %M" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+          \time -f "CPU time: %U\t\t\t Peak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
           if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
             mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
           fi
