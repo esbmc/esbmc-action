@@ -148,7 +148,7 @@ runs:
         fi 
         echo "----------------------------------------------------"
         echo "Running ESBMC for ${{ runner.os }}."
-        \time -f "----------------------------------------------------\nTotal CPU time taken: %Us\t\t\tPeak memory usage: %Mkb" command while IFS= read -r path || [[ -n $path ]]
+        \time -f "----------------------------------------------------\nTotal CPU time taken: %Us\t\t\tPeak memory usage: %Mkb" bash -c 'while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
@@ -164,7 +164,7 @@ runs:
             if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
               mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
             fi
-        done < <(printf '%s' "$run_files")
+        done < <(printf '%s' "$run_files")'
         echo "Finished verifying files."
         echo "----------------------------------------------------"
       shell: bash
@@ -225,7 +225,7 @@ runs:
         fi
         echo "----------------------------------------------------"
         echo "Running ESBMC for ${{ runner.os }}."
-        gtime -f "----------------------------------------------------\nTotal CPU time taken: %Us\t\t\tPeak memory usage: %Mkb" command while IFS= read -r path || [[ -n $path ]]
+        gtime -f "----------------------------------------------------\nTotal CPU time taken: %Us\t\t\tPeak memory usage: %Mkb" bash -c 'while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
@@ -241,7 +241,7 @@ runs:
           if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
             mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
           fi
-        done < <(printf '%s' "$run_files")
+        done < <(printf '%s' "$run_files")''
         echo "----------------------------------------------------"
         echo "Finished verifying files."
         echo "----------------------------------------------------"
