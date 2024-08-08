@@ -27,6 +27,10 @@ inputs:
     description: The level of compression for Zlib to be applied to the artifact archive. Can take values from 0 to 9.
     required: false
     default: "6"
+  checkout:
+    description: whether or not to automatically checkout the repository (y/n).
+    required: false
+    default: y
 
 outputs:
   artifact-id:
@@ -45,6 +49,7 @@ runs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 2
+      if: ${{ inputs.checkout == 'y' || inputs.checkout == 'Y' }}
 
 
     # If files are given as input, check that they exist and exit if they don't.
@@ -75,6 +80,10 @@ runs:
     - name: Get Git Diff
       id: get-diff
       run: |
+        if [[ $(git rev-list --count HEAD) -le 1 ]]; then
+          echo "error: commit depth is less than 2. This could be because no checkout of fetch-depth 2 has occured (make sure that the 'checkout' input is set to 'y') or the current branch has a depth of less than 2."
+        fi
+        
         echo "FILE_DIFF<<EOF" >> $GITHUB_ENV
         echo "$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')" >> "$GITHUB_ENV"
         echo "EOF" >> $GITHUB_ENV
