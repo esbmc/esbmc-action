@@ -80,7 +80,7 @@ runs:
     - name: Get Git Diff
       id: get-diff
       run: |
-        if [[ $(git rev-list --count) <= 1 ]]; then
+        if [[ $(git rev-list --count) -le 1 ]]; then
           echo "Error: commit depth is less than 2. This could be because no checkout of fetch-depth 2 has occured (make sure that the 'checkout' input is set to 'y') or the current branch has a depth of less than 2."
         fi
         
