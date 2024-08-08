@@ -6,6 +6,10 @@ This action is supported on Linux, Windows, and macOS runners. At the time of cr
 
 Note that only certain SMT solvers are supported on these pre-built releases. On Linux, the smtlib, z3, boolector, cvc5, and bitwuzla solvers are supported. On macOS, only smtlib is supported. On Windows, only Z3 is supported.
 
+## Version 2.0.0 what's new:
+
+Added the checkout input, which allows users to choose whether or not to checkout at the start of the action. Also added appropriate error message if correct checkout does not occur.
+
 ## Usage
 
 ```
