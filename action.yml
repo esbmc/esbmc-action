@@ -27,6 +27,10 @@ inputs:
     description: The level of compression for Zlib to be applied to the artifact archive. Can take values from 0 to 9.
     required: false
     default: "6"
+  checkout:
+    description: whether or not to automatically checkout the repository (y/n).
+    required: false
+    default: y
 
 outputs:
   artifact-id:
@@ -45,6 +49,7 @@ runs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 2
+      if: ${{ inputs.checkout == 'y' || inputs.checkout == 'Y' }}
 
 
     # If files are given as input, check that they exist and exit if they don't.
