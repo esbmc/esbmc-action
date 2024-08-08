@@ -152,7 +152,7 @@ runs:
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
             if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
               mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
             fi
@@ -175,7 +175,7 @@ runs:
     
     - name: Install ESBMC macOS
       run: |
-        brew install -q boost
+        brew install -q boost gnu-time
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
         unzip -o -q esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
@@ -230,7 +230,7 @@ runs:
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+          gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
           if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
             mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
           fi
