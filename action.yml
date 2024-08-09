@@ -109,9 +109,8 @@ runs:
 
     - name: Install ESBMC Windows
       run: |
-        Set-ExecutionPolicy AllSigned
-        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-        choco -?
+        choco install ptime
+        ptime --help
         $client = new-object System.Net.WebClient
         $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
         unzip -o -q esbmc.zip
