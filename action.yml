@@ -164,15 +164,15 @@ runs:
           echo "Running ESBMC on $path"
           \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
           if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
-            mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
+            mv "$GOTO_FILENAME" "$path""__""$NOSPACE_GOTO_FILENAME"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" && -f "$OUTPUT_FILENAME" ]]; then
-            mv "$OUTPUT_FILENAME" "__""$path""_""$NOSPACE_OUTPUT_FILENAME"
+            mv "$OUTPUT_FILENAME" "$path""__""$NOSPACE_OUTPUT_FILENAME"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
-            mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
+            mv "$WITNESS_FILENAME" "$path""__""$NOSPACE_WITNESS_FILENAME"
           fi
         done < <(printf '%s' "$run_files")
         echo "----------------------------------------------------"
@@ -198,15 +198,15 @@ runs:
           echo "Running ESBMC on $path"
           ptime $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
           if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
-            mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
+            mv "$GOTO_FILENAME" "$path""__""$NOSPACE_GOTO_FILENAME"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" && -f "$OUTPUT_FILENAME" ]]; then
-            mv "$OUTPUT_FILENAME" "__""$path""_""$NOSPACE_OUTPUT_FILENAME"
+            mv "$OUTPUT_FILENAME" "$path""__""$NOSPACE_OUTPUT_FILENAME"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
-            mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
+            mv "$WITNESS_FILENAME" "$path""__""$NOSPACE_WITNESS_FILENAME"
           fi
         done < <(printf '%s' "$run_files")
         echo "----------------------------------------------------"
@@ -276,15 +276,15 @@ runs:
           echo "Running ESBMC on $path"
           gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
           if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
-            mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
+            mv "$GOTO_FILENAME" "$path""__""$NOSPACE_GOTO_FILENAME"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" && -f "$OUTPUT_FILENAME" ]]; then
-            mv "$OUTPUT_FILENAME" "__""$path""_""$NOSPACE_OUTPUT_FILENAME"
+            mv "$OUTPUT_FILENAME" "$path""__""$NOSPACE_OUTPUT_FILENAME"
           fi
 
           if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
-            mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
+            mv "$WITNESS_FILENAME" "$path""__""$NOSPACE_WITNESS_FILENAME"
           fi
         done < <(printf '%s' "$run_files")
         echo "----------------------------------------------------"
