@@ -109,6 +109,7 @@ runs:
 
     - name: Install ESBMC Windows
       run: |
+        choco install -y -r --no-progress ptime
         $client = new-object System.Net.WebClient
         $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
         unzip -o -q esbmc.zip
@@ -148,7 +149,7 @@ runs:
 
 
     # Run ESBMC on each C and C++ file given as input or in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary.
-    - name: Run ESBMC Linux and Windows
+    - name: Run ESBMC Linux
       run: |
         if [[ "${{ inputs.files }}" == '' ]]; then
           run_files="${{ env.FILE_DIFF }}"
@@ -156,29 +157,63 @@ runs:
           run_files="${{ inputs.files }}"
         fi 
         echo "----------------------------------------------------"
-        echo "Running ESBMC for ${{ runner.os }}."
+        echo "Running ESBMC for Linux."
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
-            if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
-              mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
-            fi
+          if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
+            mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
+          fi
 
-            if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" && -f "$OUTPUT_FILENAME" ]]; then
-              mv "$OUTPUT_FILENAME" "__""$path""_""$NOSPACE_OUTPUT_FILENAME"
-            fi
+          if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" && -f "$OUTPUT_FILENAME" ]]; then
+            mv "$OUTPUT_FILENAME" "__""$path""_""$NOSPACE_OUTPUT_FILENAME"
+          fi
 
-            if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
-              mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
-            fi
+          if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
+            mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
+          fi
         done < <(printf '%s' "$run_files")
         echo "----------------------------------------------------"
         echo "Finished verifying files."
         echo "----------------------------------------------------"
       shell: bash
-      if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && (runner.os == 'Linux' || runner.os == 'Windows') }}
+      if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'Linux' }}
+
+
+    # Run ESBMC on each C and C++ file given as input or in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary.
+    - name: Run ESBMC Windows
+      run: |
+        if [[ "${{ inputs.files }}" == '' ]]; then
+          run_files="${{ env.FILE_DIFF }}"
+        else
+          run_files="${{ inputs.files }}"
+        fi 
+        echo "----------------------------------------------------"
+        echo "Running ESBMC for Windows."
+        while IFS= read -r path || [[ -n $path ]]
+        do
+          echo "----------------------------------------------------"
+          echo "Running ESBMC on $path"
+          ptime $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
+            mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
+          fi
+
+          if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" && -f "$OUTPUT_FILENAME" ]]; then
+            mv "$OUTPUT_FILENAME" "__""$path""_""$NOSPACE_OUTPUT_FILENAME"
+          fi
+
+          if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
+            mv "$WITNESS_FILENAME" "__""$path""_""$NOSPACE_WITNESS_FILENAME"
+          fi
+        done < <(printf '%s' "$run_files")
+        echo "----------------------------------------------------"
+        echo "Finished verifying files."
+        echo "----------------------------------------------------"
+      shell: bash
+      if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'Windows' }}
 
 
     
