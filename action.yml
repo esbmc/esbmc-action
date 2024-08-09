@@ -109,6 +109,7 @@ runs:
 
     - name: Install ESBMC Windows
       run: |
+        choco install ptime
         $client = new-object System.Net.WebClient
         $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
         unzip -o -q esbmc.zip
@@ -164,7 +165,7 @@ runs:
           if [[ ${{ runner.os == 'Linux' }} ]]; then
             \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
           else
-            time $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+            ptime $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
           fi
             if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
               mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
