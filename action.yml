@@ -183,6 +183,7 @@ runs:
 
 
     # Run ESBMC on each C and C++ file given as input or in the FILE_DIFF variable, making uniquely named output files for each ESBMC run if neccessary.
+    # ptime $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
     - name: Run ESBMC Windows
       run: |
         if [[ "${{ inputs.files }}" == '' ]]; then
@@ -196,7 +197,7 @@ runs:
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          ptime $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
           if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
             mv "$GOTO_FILENAME" "__""$path""_""$NOSPACE_GOTO_FILENAME"
           fi
