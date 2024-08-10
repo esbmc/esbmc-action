@@ -301,9 +301,9 @@ runs:
       with:
         name: esbmc_output
         path: |
-          *_${{ env.NOSPACE_GOTO_FILENAME }}
-          *_${{ env.NOSPACE_OUTPUT_FILENAME }}
-          *_${{ env.NOSPACE_WITNESS_FILENAME }}
+          *__${{ env.NOSPACE_GOTO_FILENAME }}
+          *__${{ env.NOSPACE_OUTPUT_FILENAME }}
+          *__${{ env.NOSPACE_WITNESS_FILENAME }}
         if-no-files-found: warn
         retention-days: ${{ inputs.artifact-retention-days }}
         compression-level: ${{ inputs.artifact-compression-level }}
