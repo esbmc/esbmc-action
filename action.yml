@@ -272,7 +272,7 @@ runs:
           echo "NOSPACE_WITNESS_FILENAME=$nospace_witness_filename" >> $GITHUB_ENV
         fi
 
-        if [[ $options =~ "--html-output" ]]; then
+        if [[ $options =~ "--generate-html-output" ]]; then
           html_filename=`echo "$options" | ggrep -oP "(--generate-html-output\s+\K[^\']\S*(?=\s*?))|(--generate-html-output\s+'\K.*(?='))"`
           echo "HTML_FILENAME=$html_filename" >> $GITHUB_ENV
           nospace_html_filename="${html_filename//+([[:space:]])/}"
