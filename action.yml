@@ -31,6 +31,10 @@ inputs:
     description: whether or not to automatically checkout the repository (y/n).
     required: false
     default: y
+  fail-fast:
+    description: whether or not to exit the action and mark it as failed if there is an ESBMC verification failure.
+    required: false
+    default: n
 
 outputs:
   artifact-id:
@@ -165,11 +169,17 @@ runs:
         fi 
         echo "----------------------------------------------------"
         echo "Running ESBMC for Linux."
+
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          if [[ ${{ inputs.fail-fast == 'y' || inputs.fail-fast == 'Y' }} ]]; then
+            \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
+          else
+            \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          fi
+
           if [[ -f "$GOTO_FILENAME" ]]; then
             mv "$GOTO_FILENAME" "$path""__""$NOSPACE_GOTO_FILENAME"
           fi
@@ -203,11 +213,17 @@ runs:
         fi 
         echo "----------------------------------------------------"
         echo "Running ESBMC for Windows."
+
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          ptime $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          if [[ ${{ inputs.fail-fast == 'y' || inputs.fail-fast == 'Y' }} ]]; then
+            ptime $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
+          else
+            ptime $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          fi
+
           if [[ -f "$GOTO_FILENAME" ]]; then
             mv "$GOTO_FILENAME" "$path""__""$NOSPACE_GOTO_FILENAME"
           fi
@@ -292,11 +308,17 @@ runs:
         fi
         echo "----------------------------------------------------"
         echo "Running ESBMC for ${{ runner.os }}."
+
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+          if [[ ${{ inputs.fail-fast == 'y' || inputs.fail-fast == 'Y' }} ]]; then
+            gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path"
+          else
+            gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+          fi
+
           if [[ -f "$GOTO_FILENAME" ]]; then
             mv "$GOTO_FILENAME" "$path""__""$NOSPACE_GOTO_FILENAME"
           fi
