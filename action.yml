@@ -175,7 +175,7 @@ runs:
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           if [[ ${{ inputs.fail-fast == 'y' || inputs.fail-fast == 'Y' }} ]]; then
-            \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+            \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
           else
             \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
           fi
