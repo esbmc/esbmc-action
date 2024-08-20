@@ -38,7 +38,7 @@ inputs:
   display-overhead:
     description: Whether or not to display the CPU seconds and peak memory usage of each run of ESBMC.
     required: false
-    default: y
+    default: n
 
 outputs:
   artifact-id:
@@ -230,7 +230,7 @@ runs:
 
         timer=""
         if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
-          timer="timeit -r"
+          timer="time"
         fi
 
         echo "----------------------------------------------------"
