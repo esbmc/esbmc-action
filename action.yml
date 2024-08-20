@@ -176,7 +176,7 @@ runs:
 
         timer=""
         if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
-          timer="\time -f \"CPU time: %Us\t\t\tPeak memory usage: %Mkb\""
+          timer="\time -f ""CPU time: %Us\t\t\tPeak memory usage: %Mkb"
         fi
 
         echo "----------------------------------------------------"
@@ -330,7 +330,7 @@ runs:
 
         timer=""
         if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
-          timer="gtime -f \"CPU time: %Us\t\t\tPeak memory usage: %Mkb\""
+          timer="gtime -f ""CPU time: %Us\t\t\tPeak memory usage: %Mkb"
         fi
 
         echo "----------------------------------------------------"
