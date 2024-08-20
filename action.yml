@@ -230,7 +230,7 @@ runs:
 
         timer=""
         if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
-          timer="time"
+          timer="\time"
         fi
 
         echo "----------------------------------------------------"
