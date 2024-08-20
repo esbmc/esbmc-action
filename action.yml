@@ -341,7 +341,7 @@ runs:
             if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
               gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path"
             else
-              $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }}
+              $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path"
             fi
           else
             if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
