@@ -114,6 +114,7 @@ runs:
         fi
         echo "FAIL_FAST=$fail_fast" >> "$GITHUB_ENV"
       shell: bash
+      if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
 
 
 
@@ -243,8 +244,12 @@ runs:
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          $timer $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" $FAIL_FAST
-
+          if [[ "${{ inputs.fail-fast }}" == 'y' || "${{ inputs.fail-fast }}" == 'Y' ]]; then
+            $timer $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
+          else
+            $timer $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          fi
+          
           if [[ -f "$GOTO_FILENAME" ]]; then
             mv "$GOTO_FILENAME" "$path""__""$NOSPACE_GOTO_FILENAME"
           fi
