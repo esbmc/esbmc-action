@@ -128,9 +128,6 @@ runs:
 
     - name: Install ESBMC Windows
       run: |
-        if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
-          choco install -y -r --no-progress ptime
-        fi
         $client = new-object System.Net.WebClient
         $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
         unzip -o -q esbmc.zip
@@ -233,7 +230,7 @@ runs:
 
         timer=""
         if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
-          timer="ptime"
+          timer="timeit -r"
         fi
 
         echo "----------------------------------------------------"
