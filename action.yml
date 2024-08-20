@@ -220,10 +220,10 @@ runs:
           echo "Running ESBMC on $path"
           if [[ "${{ inputs.fail-fast }}" == 'y' || "${{ inputs.fail-fast }}" == 'Y' ]]; then
             echo "if"
-            ptime $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
+            $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
           else
             echo "else"
-            ptime $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+            $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
           fi
 
           if [[ -f "$GOTO_FILENAME" ]]; then
