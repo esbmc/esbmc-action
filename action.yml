@@ -174,22 +174,24 @@ runs:
           run_files="${{ inputs.files }}"
         fi
 
-        timer=""
-        if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
-          timer=\time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb"
-        fi
-
         echo "----------------------------------------------------"
         echo "Running ESBMC for Linux."
-
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           if [[ "${{ inputs.fail-fast }}" == 'y' || "${{ inputs.fail-fast }}" == 'Y' ]]; then
-            $time $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" $FAIL_FAST
+            if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
+              \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
+            else
+              $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
+            fi
           else
-            $time $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" $FAIL_FAST || true
+            if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
+              \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" $FAIL_FAST || true
+            else
+              $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" $FAIL_FAST || true
+            fi
           fi
 
           if [[ -f "$GOTO_FILENAME" ]]; then
@@ -328,11 +330,6 @@ runs:
           run_files="${{ inputs.files }}"
         fi
 
-        timer=""
-        if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
-          timer=gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb"
-        fi
-
         echo "----------------------------------------------------"
         echo "Running ESBMC for ${{ runner.os }}."
 
@@ -341,9 +338,17 @@ runs:
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
           if [[ "${{ inputs.fail-fast }}" == 'y' || "${{ inputs.fail-fast }}" == 'Y' ]]; then
-            $timer $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path"
+            if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
+              gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path"
+            else
+              $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }}
+            fi
           else
-            $timer $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+            if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
+              gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+            else
+              $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+            fi
           fi
 
           if [[ -f "$GOTO_FILENAME" ]]; then
