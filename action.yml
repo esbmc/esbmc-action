@@ -128,6 +128,9 @@ runs:
 
     - name: Install ESBMC Windows
       run: |
+        if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
+          choco install -y -r --no-progress ptime
+        fi
         $client = new-object System.Net.WebClient
         $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
         unzip -o -q esbmc.zip
@@ -230,7 +233,7 @@ runs:
 
         timer=""
         if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
-          timer="\time"
+          timer="ptime"
         fi
 
         echo "----------------------------------------------------"
@@ -268,8 +271,9 @@ runs:
     
     - name: Install ESBMC macOS
       run: |
+        brew install -q boost
         if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y']]; then
-          brew install -q boost gnu-time
+          brew install -q gnu-time
         fi
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
         unzip -o -q esbmc.zip
