@@ -277,7 +277,7 @@ runs:
     - name: Install ESBMC macOS
       run: |
         brew install -q boost
-        if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y']]; then
+        if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
           brew install -q gnu-time
         fi
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
