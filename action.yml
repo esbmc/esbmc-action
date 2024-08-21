@@ -32,11 +32,11 @@ inputs:
     required: false
     default: y
   fail-fast:
-    description: Whether or not to exit the action and mark it as failed if there is an ESBMC verification failure.
+    description: Whether or not to exit the action and mark it as failed if there is an ESBMC verification failure (y/n).
     required: false
     default: n
   display-overhead:
-    description: Whether or not to display the CPU seconds and peak memory usage of each run of ESBMC.
+    description: Whether or not to display the CPU seconds and peak memory usage of each run of ESBMC (y/n).
     required: false
     default: n
 

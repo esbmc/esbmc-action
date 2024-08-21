@@ -6,9 +6,9 @@ This action is supported on Linux, Windows, and macOS runners. At the time of cr
 
 Note that only certain SMT solvers are supported on these pre-built releases. On Linux, the smtlib, z3, boolector, cvc5, and bitwuzla solvers are supported. On macOS, only smtlib is supported. On Windows, only Z3 is supported.
 
-## Version 2.0.0 what's new:
+## Version 3.0.0 what's new:
 
-Added the checkout input, which allows users to choose whether or not to checkout at the start of the action. Also added appropriate error message if correct checkout does not occur.
+Added the display-overhead and fail-fast inputs. Overhead will now not be displayed by default. Support for detecting output files created by --generate-html-report.
 
 ## Usage
 
@@ -64,6 +64,18 @@ Whether or not to automatically checkout the repository at the start of the acti
 
 Note that if this input is set to a negative option, then it will still be necessary to checkout the repository with a fetch depth of 2 for this action to work. This option exists so that the user may install any dependencies for the workflow without them being overwritten by the checkout in this action.
 
+#### fail-fast:
+
+Whether or not to exit this action when an ESBMC verification failure occurs. This value is negative ('n') by default and any value other than 'y' or 'Y' will also be interpreted as negative (do not fail fast).
+
+Note that on Windows runners, this fail-fast strategy can not be used with the display-overhead input activated. If this is done, the overhead will be displayed after each ESBMC run, but this action will not fail fast.
+
+#### display-overhead:
+
+Whether or not to display the CPU seconds taken and peak memory usage of each run of ESBMC. This value is negative ('n') by default and any value other than 'y' or 'Y' will also be interpreted as negative (do not display the overhead). It is worth taking into account that when using this input on Windows and MacOS runners, an extra package will need to be installed at the start of the action.
+
+Note that on Windows runners, this input can not be used with the fail-fast input active. If this is done, the overhead will be displayed after each ESBMC run, but this action will not fail fast.
+
 ## Outputs
 
 #### artifact-id:
@@ -87,11 +99,12 @@ jobs:
         steps:
             - name: Run ESBMC Action
               id: esbmc-action
-              uses: esbmc/esbmc-action@v1
+              uses: esbmc/esbmc-action@v3
               with:
                 esbmc-options: "--incremental-bmc --quiet --color --file-output out.txt --verbosity 4"
                 create-artifact: y
                 artifact-compression-level: 8
+                display-overhead: y
            
             - name: Test outputs
               run: |
