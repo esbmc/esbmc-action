@@ -28,9 +28,17 @@ inputs:
     required: false
     default: "6"
   checkout:
-    description: whether or not to automatically checkout the repository (y/n).
+    description: Whether or not to automatically checkout the repository (y/n).
     required: false
     default: y
+  fail-fast:
+    description: Whether or not to exit the action and mark it as failed if there is an ESBMC verification failure (y/n).
+    required: false
+    default: n
+  display-overhead:
+    description: Whether or not to display the CPU seconds and peak memory usage of each run of ESBMC (y/n).
+    required: false
+    default: n
 
 outputs:
   artifact-id:
@@ -84,9 +92,9 @@ runs:
           echo "error: commit depth is less than 2. This could be because no checkout of fetch-depth 2 has occured (make sure that the 'checkout' input is set to 'y') or the current branch has a depth of less than 2."
         fi
         
-        echo "FILE_DIFF<<EOF" >> $GITHUB_ENV
+        echo "FILE_DIFF<<EOF" >> "$GITHUB_ENV"
         echo "$(git diff --name-only --diff-filter=ACMR HEAD HEAD^ | grep -E '\.c|\.cpp')" >> "$GITHUB_ENV"
-        echo "EOF" >> $GITHUB_ENV
+        echo "EOF" >> "$GITHUB_ENV"
       shell: bash
       if: ${{ inputs.files == '' }}
 
@@ -109,7 +117,9 @@ runs:
 
     - name: Install ESBMC Windows
       run: |
-        choco install -y -r --no-progress ptime
+        if ( ( "${{ inputs.display-overhead }}" -eq 'y' ) -or ( "${{ inputs.display-overhead }}" -eq 'Y' ) ) {
+          choco install -y -r --no-progress ptime
+        }
         $client = new-object System.Net.WebClient
         $client.DownloadFile("https://github.com/esbmc/esbmc/releases/download/v7.6.1/release-windows-latest.zip", "$env:GITHUB_WORKSPACE\esbmc.zip")
         unzip -o -q esbmc.zip
@@ -118,7 +128,7 @@ runs:
       if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'Windows' }}
 
 
-    # Extract the file name given in the ESBMC options (using grep pattern matching) before removing spaces from them and saving them to environment variables.
+    # Extract the file name given in the ESBMC options before removing spaces from them and saving them to environment variables.
     - name: Get output file name Linux and Windows
       run: |
         export LANG=C.UTF-8
@@ -126,23 +136,30 @@ runs:
         options="${{ inputs.esbmc-options }}"
         if [[ $options =~ "--output-goto" ]]; then
           goto_filename=`echo "$options" | grep -oP "(--output-goto\s+\K[^\']\S*(?=\s*?))|(--output-goto\s+'\K.*(?='))"`
-          echo "GOTO_FILENAME=$goto_filename" >> $GITHUB_ENV
+          echo "GOTO_FILENAME=$goto_filename" >> "$GITHUB_ENV"
           nospace_goto_filename="${goto_filename//+([[:space:]])/}"
-          echo "NOSPACE_GOTO_FILENAME=$nospace_goto_filename" >> $GITHUB_ENV
+          echo "NOSPACE_GOTO_FILENAME=$nospace_goto_filename" >> "$GITHUB_ENV"
         fi
 
         if [[ $options =~ "--file-output" ]]; then
           output_filename=`echo "$options" | grep -oP "(--file-output\s+\K[^\']\S*(?=\s*?))|(--file-output\s+'\K.*(?='))"`
-          echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
+          echo "OUTPUT_FILENAME=$output_filename" >> "$GITHUB_ENV"
           nospace_output_filename="${output_filename//+([[:space:]])/}"
-          echo "NOSPACE_OUTPUT_FILENAME=$nospace_output_filename" >> $GITHUB_ENV
+          echo "NOSPACE_OUTPUT_FILENAME=$nospace_output_filename" >> "$GITHUB_ENV"
         fi
 
         if [[ $options =~ "--witness-output" ]]; then
           witness_filename=`echo "$options" | grep -oP "(--witness-output\s+\K[^\']\S*(?=\s*?))|(--witness-output\s+'\K.*(?='))"`
-          echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
+          echo "WITNESS_FILENAME=$witness_filename" >> "$GITHUB_ENV"
           nospace_witness_filename="${witness_filename//+([[:space:]])/}"
-          echo "NOSPACE_WITNESS_FILENAME=$nospace_witness_filename" >> $GITHUB_ENV
+          echo "NOSPACE_WITNESS_FILENAME=$nospace_witness_filename" >> "$GITHUB_ENV"
+        fi
+
+        if [[ $options =~ "--generate-html-output" ]]; then
+          html_filename=`echo "$options" | grep -oP "(--generate-html-output\s+\K[^\']\S*(?=\s*?))|(--generate-html-output\s+'\K.*(?='))"`
+          echo "HTML_FILENAME=$html_filename" >> "$GITHUB_ENV"
+          nospace_html_filename="${html_filename//+([[:space:]])/}"
+          echo "NOSPACE_HTML_FILENAME=$nospace_html_filename" >> "$GITHUB_ENV"
         fi
       shell: bash
       if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && (runner.os == 'Linux' || runner.os == 'Windows') }}
@@ -155,24 +172,42 @@ runs:
           run_files="${{ env.FILE_DIFF }}"
         else
           run_files="${{ inputs.files }}"
-        fi 
+        fi
+
         echo "----------------------------------------------------"
         echo "Running ESBMC for Linux."
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
-          if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
+          if [[ "${{ inputs.fail-fast }}" == 'y' || "${{ inputs.fail-fast }}" == 'Y' ]]; then
+            if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
+              \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
+            else
+              $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
+            fi
+          else
+            if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
+              \time -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" $FAIL_FAST || true
+            else
+              $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" $FAIL_FAST || true
+            fi
+          fi
+
+          if [[ -f "$GOTO_FILENAME" ]]; then
             mv "$GOTO_FILENAME" "$path""__""$NOSPACE_GOTO_FILENAME"
           fi
 
-          if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" && -f "$OUTPUT_FILENAME" ]]; then
+          if [[ -f "$OUTPUT_FILENAME" ]]; then
             mv "$OUTPUT_FILENAME" "$path""__""$NOSPACE_OUTPUT_FILENAME"
           fi
 
-          if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
+          if [[ -f "$WITNESS_FILENAME" ]]; then
             mv "$WITNESS_FILENAME" "$path""__""$NOSPACE_WITNESS_FILENAME"
+          fi
+
+          if [[ -f "$HTML_FILENAME" ]]; then
+            mv "$HTML_FILENAME" "$path""__""$NOSPACE_HTML_FILENAME"
           fi
         done < <(printf '%s' "$run_files")
         echo "----------------------------------------------------"
@@ -189,24 +224,40 @@ runs:
           run_files="${{ env.FILE_DIFF }}"
         else
           run_files="${{ inputs.files }}"
-        fi 
+        fi
+
+        timer=""
+        if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
+          timer="ptime"
+        fi
+
         echo "----------------------------------------------------"
         echo "Running ESBMC for Windows."
+
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          ptime $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
-          if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
+          if [[ "${{ inputs.fail-fast }}" == 'y' || "${{ inputs.fail-fast }}" == 'Y' ]]; then
+            $timer $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path"
+          else
+            $timer $GITHUB_WORKSPACE/bin/esbmc ${{ inputs.esbmc-options }} "$path" || true
+          fi
+          
+          if [[ -f "$GOTO_FILENAME" ]]; then
             mv "$GOTO_FILENAME" "$path""__""$NOSPACE_GOTO_FILENAME"
           fi
 
-          if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" && -f "$OUTPUT_FILENAME" ]]; then
+          if [[ -f "$OUTPUT_FILENAME" ]]; then
             mv "$OUTPUT_FILENAME" "$path""__""$NOSPACE_OUTPUT_FILENAME"
           fi
 
-          if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
+          if [[ -f "$WITNESS_FILENAME" ]]; then
             mv "$WITNESS_FILENAME" "$path""__""$NOSPACE_WITNESS_FILENAME"
+          fi
+
+          if [[ -f "$HTML_FILENAME" ]]; then
+            mv "$HTML_FILENAME" "$path""__""$NOSPACE_HTML_FILENAME"
           fi
         done < <(printf '%s' "$run_files")
         echo "----------------------------------------------------"
@@ -219,7 +270,10 @@ runs:
     
     - name: Install ESBMC macOS
       run: |
-        brew install -q boost gnu-time
+        brew install -q boost
+        if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
+          brew install -q gnu-time
+        fi
         wget -q -O esbmc.zip https://github.com/esbmc/esbmc/releases/download/v7.6/release-macos-latest.zip
         unzip -o -q esbmc.zip
         chmod +x $GITHUB_WORKSPACE/bin/esbmc
@@ -227,7 +281,7 @@ runs:
       if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'macOS' }}
 
 
-    # Extract the file name given in the ESBMC options (using grep pattern matching) before removing spaces from them and saving them to environment variables (macOS).
+    # Extract the file name given in the ESBMC options before removing spaces from them and saving them to environment variables (macOS).
     # Install grep via Brew to allow for Perl-regex support.
     - name: Get output file name macOS
       run: |
@@ -238,23 +292,30 @@ runs:
         options="${{ inputs.esbmc-options }}"
         if [[ $options =~ "--output-goto" ]]; then
           goto_filename=`echo "$options" | ggrep -oP "(--output-goto\s+\K[^\']\S*(?=\s*?))|(--output-goto\s+'\K.*(?='))"`
-          echo "GOTO_FILENAME=$goto_filename" >> $GITHUB_ENV
+          echo "GOTO_FILENAME=$goto_filename" >> "$GITHUB_ENV"
           nospace_goto_filename="${goto_filename//+([[:space:]])/}"
-          echo "NOSPACE_GOTO_FILENAME=$nospace_goto_filename" >> $GITHUB_ENV
+          echo "NOSPACE_GOTO_FILENAME=$nospace_goto_filename" >> "$GITHUB_ENV"
         fi
 
         if [[ $options =~ "--file-output" ]]; then
           output_filename=`echo "$options" | ggrep -oP "(--file-output\s+\K[^\']\S*(?=\s*?))|(--file-output\s+'\K.*(?='))"`
-          echo "OUTPUT_FILENAME=$output_filename" >> $GITHUB_ENV
+          echo "OUTPUT_FILENAME=$output_filename" >> "$GITHUB_ENV"
           nospace_output_filename="${output_filename//+([[:space:]])/}"
-          echo "NOSPACE_OUTPUT_FILENAME=$nospace_output_filename" >> $GITHUB_ENV
+          echo "NOSPACE_OUTPUT_FILENAME=$nospace_output_filename" >> "$GITHUB_ENV"
         fi
 
         if [[ $options =~ "--witness-output" ]]; then
           witness_filename=`echo "$options" | ggrep -oP "(--witness-output\s+\K[^\']\S*(?=\s*?))|(--witness-output\s+'\K.*(?='))"`
-          echo "WITNESS_FILENAME=$witness_filename" >> $GITHUB_ENV
+          echo "WITNESS_FILENAME=$witness_filename" >> "$GITHUB_ENV"
           nospace_witness_filename="${witness_filename//+([[:space:]])/}"
-          echo "NOSPACE_WITNESS_FILENAME=$nospace_witness_filename" >> $GITHUB_ENV
+          echo "NOSPACE_WITNESS_FILENAME=$nospace_witness_filename" >> "$GITHUB_ENV"
+        fi
+
+        if [[ $options =~ "--generate-html-output" ]]; then
+          html_filename=`echo "$options" | ggrep -oP "(--generate-html-output\s+\K[^\']\S*(?=\s*?))|(--generate-html-output\s+'\K.*(?='))"`
+          echo "HTML_FILENAME=$html_filename" >> "$GITHUB_ENV"
+          nospace_html_filename="${html_filename//+([[:space:]])/}"
+          echo "NOSPACE_HTML_FILENAME=$nospace_html_filename" >> "$GITHUB_ENV"
         fi
       shell: bash
       if: ${{ (env.FILE_DIFF != '' || inputs.files != '') && runner.os == 'macOS' }}
@@ -268,23 +329,42 @@ runs:
         else
           run_files="${{ inputs.files }}"
         fi
+
         echo "----------------------------------------------------"
         echo "Running ESBMC for ${{ runner.os }}."
+
         while IFS= read -r path || [[ -n $path ]]
         do
           echo "----------------------------------------------------"
           echo "Running ESBMC on $path"
-          gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
-          if [[ "${{ inputs.esbmc-options }}" =~ "--output-goto" && -f "$GOTO_FILENAME" ]]; then
+          if [[ "${{ inputs.fail-fast }}" == 'y' || "${{ inputs.fail-fast }}" == 'Y' ]]; then
+            if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
+              gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path"
+            else
+              $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path"
+            fi
+          else
+            if [[ "${{ inputs.display-overhead }}" == 'y' || "${{ inputs.display-overhead }}" == 'Y' ]]; then
+              gtime -f "CPU time: %Us\t\t\tPeak memory usage: %Mkb" $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+            else
+              $GITHUB_WORKSPACE/bin/esbmc --smtlib --smt-formula-only ${{ inputs.esbmc-options }} "$path" || true
+            fi
+          fi
+
+          if [[ -f "$GOTO_FILENAME" ]]; then
             mv "$GOTO_FILENAME" "$path""__""$NOSPACE_GOTO_FILENAME"
           fi
 
-          if [[ "${{ inputs.esbmc-options }}" =~ "--file-output" && -f "$OUTPUT_FILENAME" ]]; then
+          if [[ -f "$OUTPUT_FILENAME" ]]; then
             mv "$OUTPUT_FILENAME" "$path""__""$NOSPACE_OUTPUT_FILENAME"
           fi
 
-          if [[ "${{ inputs.esbmc-options }}" =~ "--witness-output" && -f "$WITNESS_FILENAME" ]]; then
+          if [[ -f "$WITNESS_FILENAME" ]]; then
             mv "$WITNESS_FILENAME" "$path""__""$NOSPACE_WITNESS_FILENAME"
+          fi
+
+          if [[ -f "$HTML_FILENAME" ]]; then
+            mv "$HTML_FILENAME" "$path""__""$NOSPACE_HTML_FILENAME"
           fi
         done < <(printf '%s' "$run_files")
         echo "----------------------------------------------------"
@@ -304,6 +384,7 @@ runs:
           **/*__${{ env.NOSPACE_GOTO_FILENAME }}
           **/*__${{ env.NOSPACE_OUTPUT_FILENAME }}
           **/*__${{ env.NOSPACE_WITNESS_FILENAME }}
+          **/*__${{ env.NOSPACE_HTML_FILENAME }}
         if-no-files-found: warn
         retention-days: ${{ inputs.artifact-retention-days }}
         compression-level: ${{ inputs.artifact-compression-level }}
